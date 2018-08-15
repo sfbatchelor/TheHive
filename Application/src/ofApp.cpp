@@ -20,9 +20,9 @@ void ofApp::setup(){
 	m_dllWatcher.lock();
 
 #ifdef _DEBUG
-	m_dllWatcher.setFile(boost::filesystem::path("..\\Content_debug.dll"), 100);
+	m_dllWatcher.setFile(boost::filesystem::path("..\\Debug\\Content_debug.dll"), 100);
 #else 
-	m_dllWatcher.setFile(boost::filesystem::path("..\\Content.dll"), 100);
+	m_dllWatcher.setFile(boost::filesystem::path("..\\Release\\Content.dll"), 100);
 #endif
 
 	m_dllWatcher.registerCallback(std::function<void()>([this]() {onDllWasModified(); }));

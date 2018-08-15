@@ -26,7 +26,7 @@ void main() {
     float incO = 2*M_PI / uDivO;
     float incA = M_PI /uDivA;
 	//float sRadius = (radius * vSoundVal[0])+.6;
-	float sRadius = 1.6;
+	float sRadius = 2.6;
 
     //Depende del polo en el que empezemos
     for (i= 0 ; i<= uDivO; i++){

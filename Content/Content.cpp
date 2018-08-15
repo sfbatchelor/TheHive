@@ -117,7 +117,7 @@ void Content::update()
 
 	if (!m_pause)
 	{
-		m_compute.getShader().begin();		m_texture.bindAsImage(0, GL_READ_ONLY);		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints/1024);		m_compute.getShader().setUniform1f("uWidth", 10000);		m_compute.getShader().setUniform1f("uHeight", 10000) 		m_compute.getShader().setUniform1f("uTime", ofGetElapsedTimef());		m_compute.getShader().setUniform1f("uMinDepth", m_minDepth);		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);		m_compute.getShader().end();
+		m_compute.getShader().begin();		m_texture.bindAsImage(0, GL_READ_ONLY);		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints/1024);		m_compute.getShader().setUniform1f("uWidth", 10000);		m_compute.getShader().setUniform1f("uHeight", 10000);		m_compute.getShader().setUniform1f("uTime", ofGetElapsedTimef());		m_compute.getShader().setUniform1f("uMinDepth", m_minDepth);		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);		m_compute.getShader().end();
 		m_pointsBuffer.copyTo(m_pointsBufferOld);
 	}
 

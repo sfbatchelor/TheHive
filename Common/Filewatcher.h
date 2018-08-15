@@ -2,6 +2,7 @@
 #include "ofThread.h"
 #include "ofTypes.h"
 #include "ofFileUtils.h"
+#include "ofLog.h"
 #include "ofUtils.h"
 #include <string>
 
@@ -50,6 +51,8 @@ public:
 		{
 			this->m_lastWriteTime = std::filesystem::last_write_time(m_file);
 		}
+		else
+			ofLogError("FileWatcher", "Cannot read file:" + m_file.getAbsolutePath());
 		m_file.close();
     }
 	
@@ -61,6 +64,8 @@ public:
 		{
 			this->m_lastWriteTime = std::filesystem::last_write_time(m_file);
 		}
+		else
+			ofLogError("FileWatcher", "Cannot read file:" + m_file.getAbsolutePath());
 		m_file.close();
  
 	}

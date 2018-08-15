@@ -25,7 +25,7 @@ uniform int uNumPointsSF = 1;
 
 uniform float uWidth = 1000.;
 uniform float uHeight = 1000.;
-uniform float uDepth = 1000.;
+uniform float uDepth = 10000.;
 uniform float uAccelScale = .005;
 
 uniform float uMinDepth = -300.;
@@ -247,7 +247,7 @@ void main(){
 	point.vel.xyz += totalAccel* uAccelScale;
 	point.vel.xyz *= .99;
 	// 2- Boundary check
-	if( point.pos.y < 0 || point.pos.y > uHeight || point.pos.x < 0 || point.pos.x > uWidth || point.pos.z < -uDepth || point.pos.z > uDepth)
+	if( point.pos.y < -uHeight || point.pos.y > uHeight || point.pos.x < -uWidth || point.pos.x > uWidth || point.pos.z < -uDepth || point.pos.z > uDepth)
 	{
 		point.vel *= -1;
 
