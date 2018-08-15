@@ -150,14 +150,10 @@ void Content::drawScene()
 
 	ofPointSmooth();
 	ofSetColor(255);
-	m_texture.draw(10000, 0, -1000, m_image.getWidth(), m_image.getHeight());
 	m_constantShader.getShader().begin();
 	m_constantShader.getShader().setUniform1i("uNumFftBands", m_numFftBands);
 	m_constantShader.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
 	m_constantShader.getShader().setUniform1f("uTime", ofGetElapsedTimef());
-	//m_constantShader.getShader().setUniform1f("uAlpha", .6f);
-	//glPointSize(5);
-	//m_pointsVbo.draw(GL_POINTS, 0, m_points.size());
 	glPointSize(3);
 	m_constantShader.getShader().setUniform1f("uAlpha", 1.f);
 	m_pointsVbo.draw(GL_POINTS, 0, m_points.size());
