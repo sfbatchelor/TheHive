@@ -19,6 +19,7 @@ public:
 	void draw();
 	void drawScene();
 	void drawInteractionArea();
+	void drawBloom();
 	void exit();
 
 	void keyPressed(int key);
@@ -45,14 +46,19 @@ private:
 	bool m_snapshot;
 
 	std::shared_ptr<ofFbo> m_fbo;
-	std::shared_ptr<ofFbo> m_brightnessOutput;
+	std::shared_ptr<ofFbo> m_bloomFront;
+	std::shared_ptr<ofFbo> m_bloomBack;
 	bool m_bloomActive;
+	ofPlanePrimitive m_plane;
 
 	ofEasyCam m_cam;
 	bool m_showGui;
 
 	ShaderWatcher m_imageShader;
 	ShaderWatcher m_constantShader;
+	ShaderWatcher m_gaussianShader;
+	ShaderWatcher m_bloomFinalShader;
+
 	ComputeWatcher m_compute;
 	ofMesh m_mesh;
 	ofImage m_image;

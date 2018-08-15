@@ -13,6 +13,8 @@ Content::Content():
 	m_numPoints = 1024 * 38;
 	m_constantShader.load("constantVert.glsl", "constantFrag.glsl", "sphereGeom.glsl");
 	m_imageShader.load("imageVert.glsl", "imageFrag.glsl");
+	m_gaussianShader.load("gaussianVert.glsl", "gaussianFrag.glsl");
+	m_bloomFinalShader.load("bloomFinalShader.glsl", "bloomFinalShader.glsl");
 	m_compute.load( "compute.glsl");
 
 
@@ -101,6 +103,9 @@ void Content::update()
 {
 	m_imageShader.update();
 	m_constantShader.update();
+	m_gaussianShader.update();
+	m_bloomFinalShader.update();
+
 	m_compute.update();
 
 	ofSoundUpdate();
@@ -136,6 +141,8 @@ void Content::update()
 		ofClear(0, 0, 0, 255);
 		drawScene();
 		m_fbo->end();
+
+		//drawBloom();
 	}
 }
 
@@ -165,7 +172,7 @@ void Content::draw()
 {
 	///// WORLD
 	{
-		if (m_bloomActive && m_fbo)		{			m_fbo->activateAllDrawBuffers();			m_fbo->getTexture(1).draw(0, 0);		}		else			drawScene();		/// SCREEN GRAB
+		if (m_bloomActive && m_fbo)		{			drawBloom();		}		else		{			drawScene();		}		/// SCREEN GRAB
 		if (m_snapshot == true) {
 			m_screenGrab.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
 			string fileName = "screenshots\\snapshot_" + ofGetTimestampString() + ".png";
@@ -228,7 +235,7 @@ void Content::draw()
 
 void Content::resetFbo()
 {
-
+	ofDisableArbTex();
 	m_fbo.reset(new ofFbo());
 	ofFbo::Settings settings;
 	settings.width = (ofGetWidth());
@@ -253,6 +260,13 @@ void Content::resetFbo()
 	m_fbo->end();
 
 
+	m_bloomFront.reset(new ofFbo());	m_bloomFront->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	m_bloomBack.reset(new ofFbo());
+	m_bloomBack->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+
+
+	m_plane.set(ofGetWidth(), ofGetHeight(), 10, 10);
+	m_plane.mapTexCoords(0, 0, ofGetWidth(), ofGetHeight());
 }
 
 void Content::drawInteractionArea()
@@ -274,11 +288,61 @@ void Content::drawInteractionArea()
 	ofPopStyle();
 }
 
+void Content::drawBloom()
+{
+	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes.
+
+	bool horizontal = true, firstIteration = true;
+	int amount = 1;
+
+	m_gaussianShader.getShader().begin();
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		m_gaussianShader.getShader().setUniform1i("horizontal", horizontal);
+		//if (horizontal)
+		//	m_bloomBack->begin();
+		//else
+		//	m_bloomFront->begin();
+//		if (firstIteration)
+		m_fbo->getTexture(1).bind();
+		m_gaussianShader.getShader().setUniformTexture("src", m_fbo->getTexture(1), 1);
+		//m_gaussianShader.getShader().setUniformTexture("src", m_image.getTexture(), 1);
+		//else if (horizontal)
+		//	m_bloomFront->getTexture().bind(0);
+		//else
+		//	m_bloomBack->getTexture().bind(0);
+
+		m_cam.begin();
+		ofSetColor(255);
+		m_plane.enableTextures();
+		m_plane.draw();
+		m_cam.end();
+
+		m_fbo->getTexture(1).unbind();
+//		if (firstIteration)
+		//else if (horizontal)
+		//	m_bloomFront->getTexture().unbind(0);
+		//else
+		//	m_bloomBack->getTexture().unbind(0);
+		//if (horizontal)
+		//	m_bloomBack->end();
+		//else
+		//	m_bloomFront->end();
+
+		horizontal = !horizontal;
+		if (firstIteration)
+			firstIteration = false;
+	}
+	m_gaussianShader.getShader().end();
+}
+
 
 void Content::exit()
 {
 	m_imageShader.exit();
 	m_constantShader.exit();
+	m_gaussianShader.exit();
+	m_bloomFinalShader.exit();
 	m_compute.exit();
 }
 
