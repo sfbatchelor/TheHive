@@ -45,6 +45,8 @@ private:
 	bool m_snapshot;
 
 	std::shared_ptr<ofFbo> m_fbo;
+	std::shared_ptr<ofFbo> m_brightnessOutput;
+	bool m_bloomActive;
 
 	ofEasyCam m_cam;
 	bool m_showGui;
@@ -73,7 +75,6 @@ private:
 
 	bool m_pause;
 	bool m_restart;
-	bool m_fboActive;
 
 	glm::vec3 m_particleBounds;
 

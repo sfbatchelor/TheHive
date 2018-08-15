@@ -3,12 +3,15 @@
 in vec4 fColour;
 in vec3 Pos;
 
-out vec4 outputColor;
+layout ( location = 0) out vec4 outputColour;
+layout ( location = 1) out vec4 brightColour;
 
 
 uniform int uNumFftBands;
 uniform float uFft [512];
 uniform float uTime;
+
+uniform float uBloomThreshhold = .07;
 
 float hash(float seed)
 {
@@ -21,7 +24,7 @@ void main() {
 
 // SOUND REACTIVE LOGIC
 	//BRIGHTNESS
-	float brightness = length(fColour.rgb)/255. ;
+	float brightness = length(fColour.rgb) ;
 	int fftLookup = int(brightness * uNumFftBands);
 	fftLookup = clamp(fftLookup, 0, uNumFftBands - 1);
 	float soundVal = uFft[fftLookup];
@@ -31,7 +34,14 @@ void main() {
 
 	rc = (sin(uTime+ Pos.x)*15.25);
 
-	outputColor.rgba = vec4(1.);
+	outputColour.rgba = vec4(1.);
+
+
+    // check whether fragment output is higher than threshold, if so output as brightness color
+    if(brightness > uBloomThreshhold)
+        brightColour = vec4(outputColour.rgb, 1.0);
+    else
+        brightColour = vec4(0.0, 0.0, 0.0, 1.0);
 	//outputColor.rgb += rc*0.02;
 
 }

@@ -1,7 +1,8 @@
 #include "Content.h"
 
 Content::Content():
-	m_particleBounds(glm::vec3(10000.))
+	m_particleBounds(glm::vec3(10000.)),
+	m_bloomActive(true)
 {
 	ofSetFrameRate(30);
 	ofSetLogLevel(OF_LOG_VERBOSE);
@@ -22,7 +23,6 @@ Content::Content():
 
 	m_pause = false;
 	m_restart = false;
-	m_fboActive = false;
 
 	m_minDepth = -300.;
 	m_maxDepth = 300.;
@@ -130,10 +130,10 @@ void Content::update()
 
 
 
-	if (m_fboActive && m_fbo)
+	if (m_bloomActive && m_fbo)
 	{
-		m_fbo->begin();
-		m_fbo->clearDepthBuffer(10000);
+		m_fbo->begin();		m_fbo->activateAllDrawBuffers();		m_fbo->clearDepthBuffer(10000);
+		ofClear(0, 0, 0, 255);
 		drawScene();
 		m_fbo->end();
 	}
@@ -141,12 +141,6 @@ void Content::update()
 
 void Content::drawScene()
 {
-	ofSetDepthTest(false);
-	ofFill();
-	ofSetColor(-100,-100,-100, 25);
-	ofDrawRectangle(0, 0, m_fbo->getWidth(), m_fbo->getHeight());
-	ofSetColor(255);
-	ofSetDepthTest(true);
 
 	m_cam.begin();
 	ofPushMatrix();
@@ -171,7 +165,7 @@ void Content::draw()
 {
 	///// WORLD
 	{
-		if (m_fboActive && m_fbo)			m_fbo->draw(0, 0);		else			drawScene();		/// SCREEN GRAB
+		if (m_bloomActive && m_fbo)		{			m_fbo->activateAllDrawBuffers();			m_fbo->getTexture(1).draw(0, 0);		}		else			drawScene();		/// SCREEN GRAB
 		if (m_snapshot == true) {
 			m_screenGrab.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
 			string fileName = "screenshots\\snapshot_" + ofGetTimestampString() + ".png";
@@ -236,10 +230,28 @@ void Content::resetFbo()
 {
 
 	m_fbo.reset(new ofFbo());
-	m_fbo->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	ofFbo::Settings settings;
+	settings.width = (ofGetWidth());
+	settings.height = (ofGetHeight());
+	settings.internalformat = GL_RGB32F;
+	settings.numSamples = 0;
+	settings.useDepth = true;
+	settings.useStencil = true;
+	settings.depthStencilAsTexture = true;
+	settings.textureTarget = GL_TEXTURE_2D;
+	settings.depthStencilInternalFormat = GL_DEPTH_COMPONENT24;
+	settings.minFilter = GL_NEAREST;
+	settings.maxFilter = GL_NEAREST;
+	settings.wrapModeHorizontal = GL_CLAMP_TO_BORDER;
+	settings.wrapModeVertical = GL_CLAMP_TO_BORDER;
+	m_fbo->allocate(settings);
+	m_fbo->createAndAttachTexture(GL_RGBA32F, 0);
+	m_fbo->createAndAttachTexture(GL_RGBA32F, 1);
 	m_fbo->begin();
+	m_fbo->activateAllDrawBuffers();
 	ofClear(0, 0, 0, 255);
 	m_fbo->end();
+
 
 }
 
@@ -286,8 +298,8 @@ void Content::keyPressed(int key)
 	case 'r':
 		m_restart = true;
 		break;
-	case 'f':
-		m_fboActive = !m_fboActive;
+	case '1':
+		m_bloomActive = !m_bloomActive;
 		break;
 	}
 }
