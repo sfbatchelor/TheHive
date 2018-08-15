@@ -221,7 +221,7 @@ void main(){
 			totalAccel += rule1(point.pos.xyz, samplePoint.pos.xyz) * .007;
 			totalAccel += rule2(point.pos.xyz,samplePoint.pos.xyz, samplePoint.vel.xyz, samplePoint.vel.xyz) * 50;
 			totalAccel += rule3(point.pos.xyz,samplePoint.pos.xyz) *.0018 ;
-
+			
 
 		}
 	}
@@ -251,19 +251,19 @@ void main(){
 	{
 		point.vel *= -1;
 
-		if(point.pos.y < 0)
-			point.pos.y = 0;
-		if(point.pos.y > uHeight)
-			point.pos.y = uHeight;
-		if(point.pos.x < 0)
-			point.pos.x = 0;
-		if(point.pos.x > uWidth)
-			point.pos.x = uWidth;
+		if(point.pos.y < -uHeight/2.)
+			point.pos.y = -uHeight/2.;
+		if(point.pos.y > uHeight/2.)
+			point.pos.y = uHeight/2.;
+		if(point.pos.x < -uWidth/2.)
+			point.pos.x = -uWidth/2.;
+		if(point.pos.x > uWidth/2.)
+			point.pos.x = uWidth/2.;
 
-		if(point.pos.z > uDepth)
-			point.pos.z = uDepth;
-		if(point.pos.z < -uDepth)
-			point.pos.z = -uDepth;
+		if(point.pos.z > uDepth/2.)
+			point.pos.z = uDepth/2.;
+		if(point.pos.z < -uDepth/2.)
+			point.pos.z = -uDepth/2.;
 	}
 	else 
 		point.pos += point.vel;
