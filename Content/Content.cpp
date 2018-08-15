@@ -39,12 +39,18 @@ Content::Content():
 		int x = ofRandom(float(m_image.getWidth()));
 		int y = ofRandom(float(m_image.getHeight()));
 
+
+
 		ofColor cur = m_image.getColor(x, y);
 		if (cur.a > 0) {
 			// the alpha value encodes depth, let's remap it to a good depth range
 			float z = ofMap(cur.getBrightness(), 0, 255, m_minDepth, m_maxDepth);
 			cur.a = 255;
+
 			m_mesh.addColor(cur);
+			// add offset to centre at origin
+			x -= m_image.getWidth() / 2; 
+			y -= m_image.getHeight() / 2;
 			ofVec3f pos(x, y, z);
 			m_mesh.addVertex(pos);
 
@@ -144,8 +150,7 @@ void Content::drawScene()
 
 	m_cam.begin();
 	ofPushMatrix();
-	ofScale(2, -2, 2); // flip the y axis and zoom in a bit
-	ofTranslate(-m_image.getWidth() / 2, -m_image.getHeight() / 2);
+	ofScale(1, -1, 1); // flip the y axis and zoom in a bit
 	ofEnableAlphaBlending();
 
 	ofPointSmooth();
@@ -177,6 +182,8 @@ void Content::draw()
 		if (m_showGui)
 		{
 			m_cam.begin();
+
+			ofSetColor(255, 100);
 			ofDrawGrid(5000, 5, true, true, true, true);
 			m_cam.end();
 		}
@@ -245,13 +252,13 @@ void Content::drawInteractionArea()
 
 	ofPushStyle();
 	ofSetLineWidth(3);
-	ofSetColor(255, 255, 0);
+	ofSetColor(255, 255, 0, 100);
 	ofNoFill();
 	glDepthMask(false);
 	ofSetCircleResolution(64);
-
 	ofDrawCircle(x, y, r);
 	glDepthMask(true);
+	ofSetColor(255);
 	ofPopStyle();
 }
 
