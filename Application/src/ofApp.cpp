@@ -5,9 +5,18 @@
 void ofApp::setup(){
 
 	m_content = loadContentCode();
+	if (!m_content.m_isValid)
+	{
+		ofLogFatalError("Setup", "Failed to get initial Content DLL. Cannot Continue..");
+		ofExit();
+	}
+	else
+	{
+		ofLogNotice("SUCCESS: Loaded Content DLL");
+	}
+
 	m_content.m_setup();
 	m_needsSetup = false;
-
 	m_dllWatcher.lock();
 
 #ifdef _DEBUG
@@ -98,8 +107,11 @@ WindowsContentCode ofApp::loadContentCode(void)
 						&& result.m_mouseEntered && result.m_mouseExited && result.m_windowResized
 						&& result.m_dragEvent && result.m_gotMessage);
 	}
+	else
+		ofLogError("LoadContentCode", "Failed to get valid DLL");
 	if (!result.m_isValid)
 	{
+		ofLogError("LoadContentCode", "Using Stub Functions in leu of real DLL");
 		result.m_setup			= ContentSetupStub;
 		result.m_update			= ContentUpdateStub;
 		result.m_render			= ContentRenderStub;

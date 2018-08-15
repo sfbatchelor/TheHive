@@ -5,10 +5,10 @@ Content::Content()
 	ofSetFrameRate(30);
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofSetVerticalSync(true);
-	ofSetWindowTitle("Digital Painting");
+	ofSetWindowTitle("The Hive");
 	m_snapshot = false;
 	m_showGui = true;
-	m_numPoints = 1024 * 240;
+	m_numPoints = 1024 * 38;
 	m_constantShader.load("constantVert.glsl", "constantFrag.glsl", "sphereGeom.glsl");
 	m_imageShader.load("imageVert.glsl", "imageFrag.glsl");
 	m_compute.load( "compute.glsl");
@@ -136,7 +136,7 @@ void Content::drawScene()
 {
 	ofSetDepthTest(false);
 	ofFill();
-	ofSetColor(-100,-100,-100, 85);
+	ofSetColor(-100,-100,-100, 25);
 	ofDrawRectangle(0, 0, m_fbo->getWidth(), m_fbo->getHeight());
 	ofSetColor(255);
 	ofSetDepthTest(true);
