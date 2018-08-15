@@ -75,4 +75,7 @@ private:
 	bool m_restart;
 	bool m_fboActive;
 
+	glm::vec3 m_particleBounds;
+
+
 };

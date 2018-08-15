@@ -1,6 +1,7 @@
 #include "Content.h"
 
-Content::Content()
+Content::Content():
+	m_particleBounds(glm::vec3(10000.))
 {
 	ofSetFrameRate(30);
 	ofSetLogLevel(OF_LOG_VERBOSE);
@@ -16,7 +17,7 @@ Content::Content()
 
 	m_soundPlayer.load("theHive.mp3");
 	m_soundPlayer.setLoop(true);
-	m_soundPlayer.play();
+	//m_soundPlayer.play();
 	m_soundPlayer.setPosition(.3);
 
 	m_pause = false;
@@ -117,7 +118,7 @@ void Content::update()
 
 	if (!m_pause)
 	{
-		m_compute.getShader().begin();		m_texture.bindAsImage(0, GL_READ_ONLY);		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints/1024);		m_compute.getShader().setUniform1f("uWidth", 10000);		m_compute.getShader().setUniform1f("uHeight", 10000);		m_compute.getShader().setUniform1f("uTime", ofGetElapsedTimef());		m_compute.getShader().setUniform1f("uMinDepth", m_minDepth);		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);		m_compute.getShader().end();
+		m_compute.getShader().begin();		m_texture.bindAsImage(0, GL_READ_ONLY);		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints/1024);		m_compute.getShader().setUniform1f("uWidth", m_particleBounds.x);		m_compute.getShader().setUniform1f("uHeight", m_particleBounds.y);		m_compute.getShader().setUniform1f("uDepth", m_particleBounds.z);		m_compute.getShader().setUniform1f("uTime", ofGetElapsedTimef());		m_compute.getShader().setUniform1f("uMinDepth", m_minDepth);		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);		m_compute.getShader().end();
 		m_pointsBuffer.copyTo(m_pointsBufferOld);
 	}
 
@@ -142,6 +143,7 @@ void Content::drawScene()
 	ofSetDepthTest(true);
 
 	m_cam.begin();
+	ofPushMatrix();
 	ofScale(2, -2, 2); // flip the y axis and zoom in a bit
 	ofTranslate(-m_image.getWidth() / 2, -m_image.getHeight() / 2);
 	ofEnableAlphaBlending();
@@ -160,6 +162,7 @@ void Content::drawScene()
 	m_constantShader.getShader().setUniform1f("uAlpha", 1.f);
 	m_pointsVbo.draw(GL_POINTS, 0, m_points.size());
 	m_constantShader.getShader().end();
+	ofPopMatrix();
 	m_cam.end();
 }
 
@@ -187,6 +190,13 @@ void Content::draw()
 	///// GUI
 	if (m_showGui)
 	{
+
+		m_cam.begin();
+		ofNoFill();
+		ofSetColor(255);
+		ofDrawBox(0, 0, 0, m_particleBounds.x, m_particleBounds.y, m_particleBounds.z);
+		ofFill();
+		m_cam.end();
 
 		stringstream ss;
 		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;

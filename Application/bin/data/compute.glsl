@@ -247,7 +247,7 @@ void main(){
 	point.vel.xyz += totalAccel* uAccelScale;
 	point.vel.xyz *= .99;
 	// 2- Boundary check
-	if( point.pos.y < -uHeight || point.pos.y > uHeight || point.pos.x < -uWidth || point.pos.x > uWidth || point.pos.z < -uDepth || point.pos.z > uDepth)
+	if( point.pos.y < -uHeight/2. || point.pos.y > uHeight/2. || point.pos.x < -uWidth/2. || point.pos.x > uWidth/2. || point.pos.z < -uDepth/2. || point.pos.z > uDepth/2.)
 	{
 		point.vel *= -1;
 
