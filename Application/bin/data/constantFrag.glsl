@@ -31,8 +31,7 @@ void main() {
 
 	rc = (sin(uTime+ Pos.x)*15.25);
 
-	outputColor = fColour;
-	outputColor.rgb *= clamp(soundVal, 0 ,1)*4.8;
+	outputColor.rgba = vec4(1.);
 	//outputColor.rgb += rc*0.02;
 
 }

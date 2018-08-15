@@ -43,7 +43,7 @@ uniform float uSeperationPointSampleRadius = 20; // ~100 points - surrounding ar
 uniform float uMaxCohDist = 100;
 uniform float uMinCohDist = 0;
 float uCohDistRange = uMaxCohDist - uMinCohDist;
-uniform float uMaxCohAccel = 50;
+uniform float uMaxCohAccel = .00005;
 
 
 uniform float uNearAlignDist = 1.;
@@ -66,7 +66,6 @@ int leftOrRight(vec3 a, vec3 b)
 		return -1;
 }
 
-
 vec3 safeNormalize(vec3 vec) 
 {
 	if(length(vec) == 0 ) 
@@ -74,6 +73,31 @@ vec3 safeNormalize(vec3 vec)
 	return normalize(vec);
 }
 
+
+vec3 rule1(vec3 my_pos, vec3 their_pos){
+	vec3 dir = my_pos-their_pos;
+	float sqd = dot(dir,dir);
+	if(sqd < 300.0*300.0){
+		return dir;
+	}
+	return vec3(0.0);
+} 
+
+vec3 rule2(vec3 my_pos, vec3 their_pos, vec3 my_vel, vec3 their_vel){
+	vec3 d = their_pos - my_pos;
+	vec3 dv = their_vel - my_vel;
+	return dv / (dot(dv,dv) + 10.0);
+}
+
+vec3 rule3(vec3 my_pos, vec3 their_pos){
+	vec3 dir = their_pos-my_pos;
+	float sqd = dot(dir,dir);
+	if(sqd < 50.0*50.0 && length(dir) != 0 ){
+		float f = 1000000.0/sqd;
+		return normalize(dir)*f;
+	}
+	return vec3(0.0);
+}
 
 layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
 
@@ -159,47 +183,51 @@ void main(){
 		if(i!=gl_GlobalInvocationID.x){
 			// significance based on distance away
 			Point samplePoint = pp[i];
-			vec3 distVec = samplePoint.pos.xyz - point.pos.xyz;
-			float dist = length(distVec);
-			if(dist < uAlignPointSampleRadius) // only points within a certain radius
-			{
-				float distSig= 1. - (dist-uNearAlignDist / uFarAlignDist - uNearAlignDist);
-			
-				// work out heading-correction
-				vec3 sDir = safeNormalize(samplePoint.vel.xyz);
-				float hc = 1. - dot(pDir, sDir);
-				//compute fuzzy-heading
-				if(leftOrRight(pDir, sDir) == 1)
-					fuzzyHeading += correctionRt *hc* distSig;
-				else
-					fuzzyHeading -= correctionRt*hc* distSig;
+//			vec3 distVec = samplePoint.pos.xyz - point.pos.xyz;
+//			float dist = length(distVec);
+//			if(dist < uAlignPointSampleRadius) // only points within a certain radius
+//			{
+//				float distSig= 1. - (dist-uNearAlignDist / uFarAlignDist - uNearAlignDist);
+//			
+//				// work out heading-correction
+//				vec3 sDir = safeNormalize(samplePoint.vel.xyz);
+//				float hc = 1. - dot(pDir, sDir);
+//				//compute fuzzy-heading
+//				if(leftOrRight(pDir, sDir) == 1)
+//					fuzzyHeading += correctionRt *hc* distSig;
+//				else
+//					fuzzyHeading -= correctionRt*hc* distSig;
+//
+//				//compute fuzzy-speed & speed correction
+//				vec3 speedDiffV = samplePoint.vel.xyz - point.vel.xyz;
+//				float speedDiffF = length(speedDiffV);
+//				float sc = clamp( max(speedDiffF,0.)/ uAlignSpeedDiffMax, 0,  uAlignSpeedDiffMax);
+//				fuzzySpeed += speedDiffV* sc * distSig * uAlignSpeedMag;
+//			}
+//			if(dist < uSeperationPointSampleRadius) // only points within a certain radius
+//			{
+//
+//				float colDiff = length(samplePoint.col.rgb - point.col.rgb);
+//				float colSig = colDiff/255.; //force is less the more similar they are
+//				float distSig = 1. - (dist / uSepFalloffDist); // force is less the further away the point is
+//				distSig*= uSepDistMag;
+//				vec3 sepDir = -safeNormalize(distVec); // repulsive so minus the direction
+//				seperation += sepDir*colSig *distSig;
+//
+//			}
+//
 
-				//compute fuzzy-speed & speed correction
-				vec3 speedDiffV = samplePoint.vel.xyz - point.vel.xyz;
-				float speedDiffF = length(speedDiffV);
-				float sc = clamp( max(speedDiffF,0.)/ uAlignSpeedDiffMax, 0,  uAlignSpeedDiffMax);
-				fuzzySpeed += speedDiffV* sc * distSig * uAlignSpeedMag;
-			}
-			if(dist < uSeperationPointSampleRadius) // only points within a certain radius
-			{
 
-				float colDiff = length(samplePoint.col.rgb - point.col.rgb);
-				float colSig = colDiff/255.; //force is less the more similar they are
-				float distSig = 1. - (dist / uSepFalloffDist); // force is less the further away the point is
-				distSig*= uSepDistMag;
-				vec3 sepDir = -safeNormalize(distVec); // repulsive so minus the direction
-				seperation += sepDir*colSig *distSig;
+			totalAccel += rule1(point.pos.xyz, samplePoint.pos.xyz) * .007;
+			totalAccel += rule2(point.pos.xyz,samplePoint.pos.xyz, samplePoint.vel.xyz, samplePoint.vel.xyz) * 50;
+			totalAccel += rule3(point.pos.xyz,samplePoint.pos.xyz) *.0018 ;
 
-			}
 
 		}
 	}
-	totalAccel += fuzzySpeed;
-	totalAccel += fuzzyHeading;
-	totalAccel += seperation;
-	totalAccel.z = 0;
-
-
+//	totalAccel += fuzzySpeed;
+//	totalAccel += fuzzyHeading;
+//	totalAccel += seperation;
 
 // FUZZY-ALLIGNMENT COLOUR 
 
@@ -215,11 +243,13 @@ void main(){
 
 // INTEGRATION 
 	// 1 - Velocity += Accel
+
 	point.vel.xyz += totalAccel* uAccelScale;
+	point.vel.xyz *= .99;
 	// 2- Boundary check
 	if( point.pos.y < 0 || point.pos.y > uHeight || point.pos.x < 0 || point.pos.x > uWidth || point.pos.z < -uDepth || point.pos.z > uDepth)
 	{
-		point.vel *= -.2;
+		point.vel *= -1;
 
 		if(point.pos.y < 0)
 			point.pos.y = 0;
