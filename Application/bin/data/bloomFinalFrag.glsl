@@ -5,18 +5,40 @@ in vec2 TexCoords;
 
 uniform sampler2D scene;
 uniform sampler2D bloomBlur;
-uniform float exposure = 9.3;
+uniform sampler2D depth;
+uniform float exposure = 1.9;
+uniform float focus = .1;
+uniform float focusNear = 0.1;
+uniform float focusFar = 3.4;
 
+float LinearizeDepth(float zoverw)  
+{  
+	float n = focusNear; // camera z near  
+	float f = focusFar; // camera z far  
+	return (2.0 * n) / (f + n - zoverw * (f - n));  
+}  
 void main()
 {             
-    const float gamma = 2.2;
+    const float gamma = 1.5;
+	vec3 bloomColor= texture(bloomBlur, TexCoords).rgb;
     vec3 hdrColor = texture(scene, TexCoords).rgb;      
-    vec3 bloomColor = vec3(0);//texture(bloomBlur, TexCoords*10).r;
-    bloomColor.rgb = texture(bloomBlur, TexCoords).rgb;
+    float depthVal = LinearizeDepth(texture(depth, TexCoords).r);      
+
+	// BLOOM
     hdrColor += bloomColor; // additive blending
+	vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
+	// DOF
+	float vfocus = clamp(focus ,0.,1.);
+	float depthDiff = length(vfocus - depthVal);
+	result = mix(hdrColor, bloomColor, 0);
+	
     // tone mapping
-    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
     // also gamma correct while we're at it       
     result = pow(result, vec3(1.0 / gamma));
-    FragColor = vec4(hdrColor, 1.0);
+
+
+
+
+    FragColor = vec4(result, 1.0);
+   // FragColor = vec4(depthDiff,0,0, 1.0);
 }  

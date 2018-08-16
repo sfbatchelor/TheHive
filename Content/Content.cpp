@@ -154,6 +154,7 @@ void Content::update()
 		m_fbo->begin();
 		m_fbo->activateAllDrawBuffers();
 		m_fbo->clearDepthBuffer(10000);
+		glEnable(GL_DEPTH_TEST);  
 		ofClear(0, 0, 0, 255);
 		drawScene();
 		m_fbo->end();
@@ -318,7 +319,7 @@ void Content::drawBloom()
 	//GAUSSIAN BLUR PASS
 	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes ping-pong style
 	bool horizontal = true, firstIteration = true;
-	int amount = 20;
+	int amount = 30;
 
 	m_gaussianShader.getShader().begin();
 	for (unsigned int i = 0; i < amount; i++)
@@ -366,6 +367,7 @@ void Content::drawBloom()
 		m_bloomFinalShader.getShader().begin();
 		m_bloomFinalShader.getShader().setUniformTexture("scene", m_fbo->getTexture(0), 5);
 		m_bloomFinalShader.getShader().setUniformTexture("bloomBlur", m_bloomFront->getTexture(), 6);
+		m_bloomFinalShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 7);
 		ofSetColor(255);
 		m_plane.enableTextures();
 		ofClear(0, 0, 0, 255);
