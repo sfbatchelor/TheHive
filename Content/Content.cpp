@@ -14,7 +14,7 @@ Content::Content():
 	m_constantShader.load("constantVert.glsl", "constantFrag.glsl", "sphereGeom.glsl");
 	m_imageShader.load("imageVert.glsl", "imageFrag.glsl");
 	m_gaussianShader.load("gaussianVert.glsl", "gaussianFrag.glsl");
-	m_bloomFinalShader.load("bloomFinalShader.glsl", "bloomFinalShader.glsl");
+	m_bloomFinalShader.load("bloomFinalVert.glsl", "bloomFinalFrag.glsl");
 	m_compute.load( "compute.glsl");
 
 
@@ -187,7 +187,7 @@ void Content::draw()
 	if (m_bloomActive && m_fbo)
 	{
 		drawBloom();
-		m_bloomFront->getTexture().draw(0, 0);
+		m_bloomFinal->getTexture().draw(0, 0);
 	}
 	else
 	{
@@ -284,9 +284,12 @@ void Content::resetFbo()
 	m_bloomFront->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 	m_bloomBack.reset(new ofFbo());
 	m_bloomBack->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	m_bloomFinal.reset(new ofFbo());
+	m_bloomFinal->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	m_bloomFinal->getTexture().getTextureData().bFlipTexture = true;
 
 	// unit quad with normalized texels
-	m_plane.set(2, 2, 10, 10);
+	m_plane.set(2. * (ofGetWidth() / ofGetHeight()), 2, 10, 10);
 	m_plane.mapTexCoords(0, 0, 1., 1.);
 }
 
@@ -311,10 +314,11 @@ void Content::drawInteractionArea()
 
 void Content::drawBloom()
 {
-	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes ping-pong style
 
+	//GAUSSIAN BLUR PASS
+	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes ping-pong style
 	bool horizontal = true, firstIteration = true;
-	int amount = 10;
+	int amount = 20;
 
 	m_gaussianShader.getShader().begin();
 	for (unsigned int i = 0; i < amount; i++)
@@ -353,6 +357,24 @@ void Content::drawBloom()
 			firstIteration = false;
 	}
 	m_gaussianShader.getShader().end();
+
+
+	if (m_bloomFinal)
+	{
+		//FINAL BLEND PASS
+		m_bloomFinal->begin();
+		m_bloomFinalShader.getShader().begin();
+		m_fbo->getTexture(0).bind(1);
+		m_bloomFront->getTexture().bind(0);
+		ofSetColor(255);
+		m_plane.enableTextures();
+		ofClear(0, 0, 0, 255);
+		m_plane.draw();
+		m_fbo->getTexture(0).unbind(1);
+		m_bloomFront->getTexture().unbind(0);
+		m_bloomFinalShader.getShader().end();
+		m_bloomFinal->end();
+	}
 
 }
 

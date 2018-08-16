@@ -49,6 +49,7 @@ private:
 	std::shared_ptr<ofFbo> m_fbo;
 	std::shared_ptr<ofFbo> m_bloomFront;
 	std::shared_ptr<ofFbo> m_bloomBack;
+	std::shared_ptr<ofFbo> m_bloomFinal;
 	bool m_bloomActive;
 	ofPlanePrimitive m_plane;
 
