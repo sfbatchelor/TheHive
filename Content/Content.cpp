@@ -238,8 +238,8 @@ void Content::resetFbo()
 	ofDisableArbTex();
 	m_fbo.reset(new ofFbo());
 	ofFbo::Settings settings;
-	settings.width = (ofGetWidth());
-	settings.height = (ofGetHeight());
+	settings.width = ofNextPow2(ofGetWidth());
+	settings.height = ofNextPow2(ofGetHeight());
 	settings.internalformat = GL_RGB32F;
 	settings.numSamples = 0;
 	settings.useDepth = true;
@@ -266,7 +266,7 @@ void Content::resetFbo()
 
 
 	m_plane.set(ofGetWidth(), ofGetHeight(), 10, 10);
-	m_plane.mapTexCoords(0, 0, ofGetWidth(), ofGetHeight());
+	m_plane.mapTexCoords(0, 0, 1., 1.);
 }
 
 void Content::drawInteractionArea()
@@ -304,8 +304,9 @@ void Content::drawBloom()
 		//else
 		//	m_bloomFront->begin();
 //		if (firstIteration)
-		m_fbo->getTexture(1).bind();
-		m_gaussianShader.getShader().setUniformTexture("src", m_fbo->getTexture(1), 1);
+		m_fbo->getTexture(1).bind(0);
+		//m_image.bind(0);
+		//m_gaussianShader.getShader().setUniformTexture("src", m_fbo->getTexture(1), 1);
 		//m_gaussianShader.getShader().setUniformTexture("src", m_image.getTexture(), 1);
 		//else if (horizontal)
 		//	m_bloomFront->getTexture().bind(0);
@@ -318,7 +319,8 @@ void Content::drawBloom()
 		m_plane.draw();
 		m_cam.end();
 
-		m_fbo->getTexture(1).unbind();
+		//m_image.unbind(0);
+		m_fbo->getTexture(1).unbind(0);
 //		if (firstIteration)
 		//else if (horizontal)
 		//	m_bloomFront->getTexture().unbind(0);
