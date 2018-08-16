@@ -28,7 +28,7 @@ void main()
             result += texture(src, TexCoords - vec2(0.0, tex_offset.y * i)).rgb * weight[i];
         }
     }
-    result = texture(src, TexCoords).rgb ; // current fragment's contribution
+    //result = texture(src, TexCoords).rgb ; // current fragment's contribution
     FragColor = vec4(result, 1.0);
     //FragColor.rg =  (TexCoords)/2200;
 

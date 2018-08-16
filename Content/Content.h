@@ -17,6 +17,7 @@ public:
 
 	void update();
 	void draw();
+
 	void drawScene();
 	void drawInteractionArea();
 	void drawBloom();

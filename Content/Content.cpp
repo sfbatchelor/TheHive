@@ -129,7 +129,21 @@ void Content::update()
 
 	if (!m_pause)
 	{
-		m_compute.getShader().begin();		m_texture.bindAsImage(0, GL_READ_ONLY);		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints/1024);		m_compute.getShader().setUniform1f("uWidth", m_particleBounds.x);		m_compute.getShader().setUniform1f("uHeight", m_particleBounds.y);		m_compute.getShader().setUniform1f("uDepth", m_particleBounds.z);		m_compute.getShader().setUniform1f("uTime", ofGetElapsedTimef());		m_compute.getShader().setUniform1f("uMinDepth", m_minDepth);		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);		m_compute.getShader().end();
+		m_compute.getShader().begin();
+		m_texture.bindAsImage(0, GL_READ_ONLY);
+		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints/1024);
+		m_compute.getShader().setUniform1f("uWidth", m_particleBounds.x);
+		m_compute.getShader().setUniform1f("uHeight", m_particleBounds.y);
+		m_compute.getShader().setUniform1f("uDepth", m_particleBounds.z);
+		m_compute.getShader().setUniform1f("uTime", ofGetElapsedTimef());
+		m_compute.getShader().setUniform1f("uMinDepth", m_minDepth);
+		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);
+		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);
+		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
+
+
+		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);
+		m_compute.getShader().end();
 		m_pointsBuffer.copyTo(m_pointsBufferOld);
 	}
 
@@ -137,7 +151,9 @@ void Content::update()
 
 	if (m_bloomActive && m_fbo)
 	{
-		m_fbo->begin();		m_fbo->activateAllDrawBuffers();		m_fbo->clearDepthBuffer(10000);
+		m_fbo->begin();
+		m_fbo->activateAllDrawBuffers();
+		m_fbo->clearDepthBuffer(10000);
 		ofClear(0, 0, 0, 255);
 		drawScene();
 		m_fbo->end();
@@ -148,13 +164,10 @@ void Content::update()
 
 void Content::drawScene()
 {
-
 	m_cam.begin();
 	ofPushMatrix();
-	ofScale(1, -1, 1); // flip the y axis and zoom in a bit
+	ofScale(1, -1, 1); 
 	ofEnableAlphaBlending();
-
-	ofPointSmooth();
 	ofSetColor(255);
 	m_constantShader.getShader().begin();
 	m_constantShader.getShader().setUniform1i("uNumFftBands", m_numFftBands);
@@ -171,25 +184,33 @@ void Content::drawScene()
 void Content::draw()
 {
 	///// WORLD
+	if (m_bloomActive && m_fbo)
 	{
-		if (m_bloomActive && m_fbo)		{			drawBloom();		}		else		{			drawScene();		}		/// SCREEN GRAB
-		if (m_snapshot == true) {
-			m_screenGrab.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
-			string fileName = "screenshots\\snapshot_" + ofGetTimestampString() + ".png";
-			m_screenGrab.save(fileName);
-			m_snapshot = false;
-		}
-
-		if (m_showGui)
-		{
-			m_cam.begin();
-
-			ofSetColor(255, 100);
-			ofDrawGrid(5000, 5, true, true, true, true);
-			m_cam.end();
-		}
-
+		drawBloom();
+		m_bloomFront->getTexture().draw(0, 0);
 	}
+	else
+	{
+		drawScene();
+	}
+
+	/// SCREEN GRAB
+	if (m_snapshot == true) {
+		m_screenGrab.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+		string fileName = "screenshots\\snapshot_" + ofGetTimestampString() + ".png";
+		m_screenGrab.save(fileName);
+		m_snapshot = false;
+	}
+
+	if (m_showGui)
+	{
+		m_cam.begin();
+
+		ofSetColor(255, 100);
+		ofDrawGrid(5000, 5, true, true, true, true);
+		m_cam.end();
+	}
+
 
 	///// GUI
 	if (m_showGui)
@@ -223,15 +244,12 @@ void Content::draw()
 		{
 			ofSetColor(0,255, 0);
 			ofDrawTriangle(glm::vec2(ofGetWidth() - 150, ofGetHeight() - 200), glm::vec2(ofGetWidth() - 150, ofGetHeight() - 120),  glm::vec2(ofGetWidth() - 65, ofGetHeight() - 160));
-
-
 			ofSetColor(255);
 		}
 	}
 
 
 }
-
 
 void Content::resetFbo()
 {
@@ -258,14 +276,17 @@ void Content::resetFbo()
 	m_fbo->activateAllDrawBuffers();
 	ofClear(0, 0, 0, 255);
 	m_fbo->end();
+	m_fbo->getTexture(0).getTextureData().bFlipTexture = true;
+	m_fbo->getTexture(1).getTextureData().bFlipTexture = true;
 
 
-	m_bloomFront.reset(new ofFbo());	m_bloomFront->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	m_bloomFront.reset(new ofFbo());
+	m_bloomFront->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 	m_bloomBack.reset(new ofFbo());
 	m_bloomBack->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 
-
-	m_plane.set(ofGetWidth(), ofGetHeight(), 10, 10);
+	// unit quad with normalized texels
+	m_plane.set(2, 2, 10, 10);
 	m_plane.mapTexCoords(0, 0, 1., 1.);
 }
 
@@ -290,52 +311,49 @@ void Content::drawInteractionArea()
 
 void Content::drawBloom()
 {
-	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes.
+	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes ping-pong style
 
 	bool horizontal = true, firstIteration = true;
-	int amount = 1;
+	int amount = 10;
 
 	m_gaussianShader.getShader().begin();
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		m_gaussianShader.getShader().setUniform1i("horizontal", horizontal);
-		//if (horizontal)
-		//	m_bloomBack->begin();
-		//else
-		//	m_bloomFront->begin();
-//		if (firstIteration)
-		m_fbo->getTexture(1).bind(0);
-		//m_image.bind(0);
-		//m_gaussianShader.getShader().setUniformTexture("src", m_fbo->getTexture(1), 1);
-		//m_gaussianShader.getShader().setUniformTexture("src", m_image.getTexture(), 1);
-		//else if (horizontal)
-		//	m_bloomFront->getTexture().bind(0);
-		//else
-		//	m_bloomBack->getTexture().bind(0);
+		if (horizontal)
+			m_bloomBack->begin();
+		else
+			m_bloomFront->begin();
 
-		m_cam.begin();
+		if (firstIteration)
+			m_fbo->getTexture(1).bind(0);
+		else if (horizontal)
+			m_bloomFront->getTexture().bind(0);
+		else
+			m_bloomBack->getTexture().bind(0);
+
 		ofSetColor(255);
 		m_plane.enableTextures();
+		ofClear(0, 0, 0, 255);
 		m_plane.draw();
-		m_cam.end();
 
-		//m_image.unbind(0);
-		m_fbo->getTexture(1).unbind(0);
-//		if (firstIteration)
-		//else if (horizontal)
-		//	m_bloomFront->getTexture().unbind(0);
-		//else
-		//	m_bloomBack->getTexture().unbind(0);
-		//if (horizontal)
-		//	m_bloomBack->end();
-		//else
-		//	m_bloomFront->end();
+		if (firstIteration)
+			m_fbo->getTexture(1).unbind(0);
+		else if (horizontal)
+			m_bloomFront->getTexture().unbind(0);
+		else
+			m_bloomBack->getTexture().unbind(0);
+		if (horizontal)
+			m_bloomBack->end();
+		else
+			m_bloomFront->end();
 
 		horizontal = !horizontal;
 		if (firstIteration)
 			firstIteration = false;
 	}
 	m_gaussianShader.getShader().end();
+
 }
 
 
