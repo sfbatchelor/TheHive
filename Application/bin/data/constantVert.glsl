@@ -31,15 +31,10 @@ void main()
 	fftLookup = clamp(fftLookup, 0, uNumFftBands - 1);
 	vSoundVal = uFft[fftLookup];
 
-	// change colour based on distance away from camera (view)
-	float dist = length(modelView*position);
+
 	vColour = vec4(1.);
 	vColour.rgb *= uAlpha;
 	vColour.a = uAlpha;
-
-	float s = max(0,(dist - minDist))/(maxDist - minDist );
-	vColour.rgb = mix(vColour.rgb, vColour.rgb*.01,s);
-
 
 	vec4 pos = position;
 	pos.z += 1*vSoundVal;

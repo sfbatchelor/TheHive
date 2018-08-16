@@ -20,7 +20,8 @@ public:
 
 	void drawScene();
 	void drawInteractionArea();
-	void drawBloom();
+	void drawBloom( ofTexture& sceneTexture, ofTexture& highlightsTexture);
+	void drawDOF( ofTexture& sceneTexture);
 	void exit();
 
 	void keyPressed(int key);
@@ -47,9 +48,10 @@ private:
 	bool m_snapshot;
 
 	std::shared_ptr<ofFbo> m_fbo;
-	std::shared_ptr<ofFbo> m_bloomFront;
-	std::shared_ptr<ofFbo> m_bloomBack;
+	std::shared_ptr<ofFbo> m_gaussianFront;
+	std::shared_ptr<ofFbo> m_gaussianBack;
 	std::shared_ptr<ofFbo> m_bloomFinal;
+	std::shared_ptr<ofFbo> m_dofFinal;
 	bool m_bloomActive;
 	ofPlanePrimitive m_plane;
 
@@ -60,6 +62,7 @@ private:
 	ShaderWatcher m_constantShader;
 	ShaderWatcher m_gaussianShader;
 	ShaderWatcher m_bloomFinalShader;
+	ShaderWatcher m_dofFinalShader;
 
 	ComputeWatcher m_compute;
 	ofMesh m_mesh;

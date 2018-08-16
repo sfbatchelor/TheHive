@@ -15,6 +15,7 @@ Content::Content():
 	m_imageShader.load("imageVert.glsl", "imageFrag.glsl");
 	m_gaussianShader.load("gaussianVert.glsl", "gaussianFrag.glsl");
 	m_bloomFinalShader.load("bloomFinalVert.glsl", "bloomFinalFrag.glsl");
+	m_dofFinalShader.load("dofFinalVert.glsl", "dofFinalFrag.glsl");
 	m_compute.load( "compute.glsl");
 
 
@@ -105,6 +106,7 @@ void Content::update()
 	m_constantShader.update();
 	m_gaussianShader.update();
 	m_bloomFinalShader.update();
+	m_dofFinalShader.update();
 
 	m_compute.update();
 
@@ -186,7 +188,9 @@ void Content::draw()
 	///// WORLD
 	if (m_bloomActive && m_fbo)
 	{
-		drawBloom();
+		drawBloom(m_fbo->getTexture(0), m_fbo->getTexture(1));
+//		drawDOF(m_fbo->getTexture(0));
+//		m_dofFinal->getTexture().draw(0, 0);
 		m_bloomFinal->getTexture().draw(0, 0);
 	}
 	else
@@ -267,8 +271,8 @@ void Content::resetFbo()
 	settings.depthStencilInternalFormat = GL_DEPTH_COMPONENT24;
 	settings.minFilter = GL_NEAREST;
 	settings.maxFilter = GL_NEAREST;
-	settings.wrapModeHorizontal = GL_CLAMP_TO_BORDER;
-	settings.wrapModeVertical = GL_CLAMP_TO_BORDER;
+	//settings.wrapModeHorizontal = GL_CLAMP_TO_BORDER;
+	//settings.wrapModeVertical = GL_CLAMP_TO_BORDER;
 	m_fbo->allocate(settings);
 	m_fbo->createAndAttachTexture(GL_RGBA32F, 0);
 	m_fbo->createAndAttachTexture(GL_RGBA32F, 1);
@@ -280,13 +284,16 @@ void Content::resetFbo()
 	m_fbo->getTexture(1).getTextureData().bFlipTexture = true;
 
 
-	m_bloomFront.reset(new ofFbo());
-	m_bloomFront->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
-	m_bloomBack.reset(new ofFbo());
-	m_bloomBack->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	m_gaussianFront.reset(new ofFbo());
+	m_gaussianFront->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	m_gaussianBack.reset(new ofFbo());
+	m_gaussianBack->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 	m_bloomFinal.reset(new ofFbo());
 	m_bloomFinal->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 	m_bloomFinal->getTexture().getTextureData().bFlipTexture = true;
+	m_dofFinal.reset(new ofFbo());
+	m_dofFinal->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	m_dofFinal->getTexture().getTextureData().bFlipTexture = true;
 
 	// unit quad with normalized texels
 	m_plane.set(2. * (ofGetWidth() / ofGetHeight()), 2, 10, 10);
@@ -312,7 +319,7 @@ void Content::drawInteractionArea()
 	ofPopStyle();
 }
 
-void Content::drawBloom()
+void Content::drawBloom( ofTexture& sceneTexture, ofTexture& highlightsTexture)
 {
 
 	//GAUSSIAN BLUR PASS
@@ -324,17 +331,18 @@ void Content::drawBloom()
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		m_gaussianShader.getShader().setUniform1i("horizontal", horizontal);
+		m_gaussianShader.getShader().setUniform1i("DOF", false);
 		if (horizontal)
-			m_bloomBack->begin();
+			m_gaussianBack->begin();
 		else
-			m_bloomFront->begin();
+			m_gaussianFront->begin();
 
 		if (firstIteration)
-			m_fbo->getTexture(1).bind(0);
+			highlightsTexture.bind(0);
 		else if (horizontal)
-			m_bloomFront->getTexture().bind(0);
+			m_gaussianFront->getTexture().bind(0);
 		else
-			m_bloomBack->getTexture().bind(0);
+			m_gaussianBack->getTexture().bind(0);
 
 		ofSetColor(255);
 		m_plane.enableTextures();
@@ -342,15 +350,15 @@ void Content::drawBloom()
 		m_plane.draw();
 
 		if (firstIteration)
-			m_fbo->getTexture(1).unbind(0);
+			highlightsTexture.unbind(0);
 		else if (horizontal)
-			m_bloomFront->getTexture().unbind(0);
+			m_gaussianFront->getTexture().unbind(0);
 		else
-			m_bloomBack->getTexture().unbind(0);
+			m_gaussianBack->getTexture().unbind(0);
 		if (horizontal)
-			m_bloomBack->end();
+			m_gaussianBack->end();
 		else
-			m_bloomFront->end();
+			m_gaussianFront->end();
 
 		horizontal = !horizontal;
 		if (firstIteration)
@@ -364,21 +372,89 @@ void Content::drawBloom()
 		//FINAL BLEND PASS
 		m_bloomFinal->begin();
 		m_bloomFinalShader.getShader().begin();
-		m_bloomFinalShader.getShader().setUniformTexture("scene", m_fbo->getTexture(0), 5);
-		m_bloomFinalShader.getShader().setUniformTexture("bloomBlur", m_bloomFront->getTexture(), 6);
+		m_bloomFinalShader.getShader().setUniformTexture("scene", sceneTexture, 5);
+		m_bloomFinalShader.getShader().setUniformTexture("bloomBlur", m_gaussianFront->getTexture(), 6);
 		m_bloomFinalShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 7);
 		ofSetColor(255);
 		m_plane.enableTextures();
 		ofClear(0, 0, 0, 255);
 		m_plane.draw();
 		m_fbo->getTexture(0).unbind(5);
-		m_bloomFront->getTexture().unbind(6);
+		m_gaussianFront->getTexture().unbind(6);
 		m_bloomFinalShader.getShader().end();
 		m_bloomFinal->end();
 	}
 
 }
 
+void Content::drawDOF( ofTexture& sceneTexture)
+{
+
+	//GAUSSIAN BLUR PASS
+	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes ping-pong style
+	bool horizontal = true, firstIteration = true;
+	int amount = 50;
+
+	m_gaussianShader.getShader().begin();
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		m_gaussianShader.getShader().setUniform1i("horizontal", horizontal);
+		m_gaussianShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 5);
+		m_gaussianShader.getShader().setUniform1i("DOF", true);
+		if (horizontal)
+			m_gaussianBack->begin();
+		else
+			m_gaussianFront->begin();
+
+		if (firstIteration)
+			sceneTexture.bind(0);
+		else if (horizontal)
+			m_gaussianFront->getTexture().bind(0);
+		else
+			m_gaussianBack->getTexture().bind(0);
+
+		ofSetColor(255);
+		m_plane.enableTextures();
+		ofClear(0, 0, 0, 255);
+		m_plane.draw();
+
+		if (firstIteration)
+			sceneTexture.unbind(0);
+		else if (horizontal)
+			m_gaussianFront->getTexture().unbind(0);
+		else
+			m_gaussianBack->getTexture().unbind(0);
+		if (horizontal)
+			m_gaussianBack->end();
+		else
+			m_gaussianFront->end();
+
+		horizontal = !horizontal;
+		if (firstIteration)
+			firstIteration = false;
+	}
+	m_gaussianShader.getShader().end();
+
+
+	if (m_dofFinal)
+	{
+		//FINAL BLEND PASS
+		m_dofFinal->begin();
+		m_dofFinalShader.getShader().begin();
+		m_dofFinalShader.getShader().setUniformTexture("scene", sceneTexture, 5);
+		m_dofFinalShader.getShader().setUniformTexture("bloomBlur", m_gaussianFront->getTexture(), 6);
+		m_dofFinalShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 7);
+		ofSetColor(255);
+		m_plane.enableTextures();
+		ofClear(0, 0, 0, 255);
+		m_plane.draw();
+		m_fbo->getTexture(0).unbind(5);
+		m_gaussianFront->getTexture().unbind(6);
+		m_dofFinalShader.getShader().end();
+		m_dofFinal->end();
+	}
+
+}
 
 void Content::exit()
 {
@@ -386,6 +462,7 @@ void Content::exit()
 	m_constantShader.exit();
 	m_gaussianShader.exit();
 	m_bloomFinalShader.exit();
+	m_dofFinalShader.exit();
 	m_compute.exit();
 }
 
