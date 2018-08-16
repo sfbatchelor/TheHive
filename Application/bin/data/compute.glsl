@@ -31,7 +31,6 @@ uniform float uAccelScale = .005;
 uniform float uMinDepth = -300.;
 uniform float uMaxDepth = 300.;
 
-
 uniform int uNumFftBands = 512;
 uniform float uFft [512];
 
@@ -73,6 +72,38 @@ vec3 safeNormalize(vec3 vec)
 	return normalize(vec);
 }
 
+
+
+// 2D Random
+float random (in vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))
+                 * 43758.5453123);
+}
+
+// 2D Noise based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
+float noise (in vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+
+    // Four corners in 2D of a tile
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+
+    // Smooth Interpolation
+
+    // Cubic Hermine Curve.  Same as SmoothStep()
+    vec2 u = f*f*(3.0-2.0*f);
+    // u = smoothstep(0.,1.,f);
+
+    // Mix 4 coorners percentages
+    return mix(a, b, u.x) +
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
 
 vec3 rule1(vec3 my_pos, vec3 their_pos){
 	vec3 dir = my_pos-their_pos;
@@ -225,6 +256,11 @@ void main(){
 
 		}
 	}
+
+	vec3 noiseDir = vec3((noise(point.pos.xy/1000) - .5)*2.);
+	noiseDir.y = (noise(point.pos.xx/1000) - .5)*.2;
+	noiseDir.z = (noise(point.pos.xz/1000) - .5)*.2;
+
 //	totalAccel += fuzzySpeed;
 //	totalAccel += fuzzyHeading;
 //	totalAccel += seperation;
@@ -269,6 +305,7 @@ void main(){
 		point.pos += point.vel;
 
 	
+	//point.pos.xyz += noiseDir*10;
 
 	//point.col.rg = (.7 + normalize(point.vel.xy) * .5)*255.;
 

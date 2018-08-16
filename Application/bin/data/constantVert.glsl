@@ -3,9 +3,13 @@
 // these are for the programmable pipeline system and are passed in
 // by default from OpenFrameworks
 uniform mat4 modelViewProjectionMatrix;
+uniform mat4 modelView;
 
 uniform int uNumFftBands;
 uniform float uFft [512];
+
+uniform float minDist = 2.;
+uniform float maxDist = 2000.;
 
 in vec4 position;
 in vec4 colour;
@@ -27,9 +31,14 @@ void main()
 	fftLookup = clamp(fftLookup, 0, uNumFftBands - 1);
 	vSoundVal = uFft[fftLookup];
 
-	vColour = colour/255.;
+	// change colour based on distance away from camera (view)
+	float dist = length(modelView*position);
+	vColour = vec4(1.);
 	vColour.rgb *= uAlpha;
 	vColour.a = uAlpha;
+
+	float s = max(0,(dist - minDist))/(maxDist - minDist );
+	vColour.rgb = mix(vColour.rgb, vColour.rgb*.01,s);
 
 
 	vec4 pos = position;

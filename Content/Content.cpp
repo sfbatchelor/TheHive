@@ -131,7 +131,7 @@ void Content::update()
 	{
 		m_compute.getShader().begin();
 		m_texture.bindAsImage(0, GL_READ_ONLY);
-		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints/1024);
+		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints / 1024);
 		m_compute.getShader().setUniform1f("uWidth", m_particleBounds.x);
 		m_compute.getShader().setUniform1f("uHeight", m_particleBounds.y);
 		m_compute.getShader().setUniform1f("uDepth", m_particleBounds.z);
@@ -140,8 +140,6 @@ void Content::update()
 		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);
 		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);
 		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
-
-
 		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);
 		m_compute.getShader().end();
 		m_pointsBuffer.copyTo(m_pointsBufferOld);
@@ -174,6 +172,7 @@ void Content::drawScene()
 	m_constantShader.getShader().setUniform1i("uNumFftBands", m_numFftBands);
 	m_constantShader.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
 	m_constantShader.getShader().setUniform1f("uTime", ofGetElapsedTimef());
+	m_constantShader.getShader().setUniformMatrix4f("modelView", m_cam.getModelViewMatrix());
 	glPointSize(3);
 	m_constantShader.getShader().setUniform1f("uAlpha", 1.f);
 	m_pointsVbo.draw(GL_POINTS, 0, m_points.size());
@@ -319,7 +318,7 @@ void Content::drawBloom()
 	//GAUSSIAN BLUR PASS
 	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes ping-pong style
 	bool horizontal = true, firstIteration = true;
-	int amount = 30;
+	int amount = 20;
 
 	m_gaussianShader.getShader().begin();
 	for (unsigned int i = 0; i < amount; i++)
