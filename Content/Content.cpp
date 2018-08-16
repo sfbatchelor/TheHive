@@ -364,14 +364,14 @@ void Content::drawBloom()
 		//FINAL BLEND PASS
 		m_bloomFinal->begin();
 		m_bloomFinalShader.getShader().begin();
-		m_fbo->getTexture(0).bind(1);
-		m_bloomFront->getTexture().bind(0);
+		m_bloomFinalShader.getShader().setUniformTexture("scene", m_fbo->getTexture(0), 5);
+		m_bloomFinalShader.getShader().setUniformTexture("bloomBlur", m_bloomFront->getTexture(), 6);
 		ofSetColor(255);
 		m_plane.enableTextures();
 		ofClear(0, 0, 0, 255);
 		m_plane.draw();
-		m_fbo->getTexture(0).unbind(1);
-		m_bloomFront->getTexture().unbind(0);
+		m_fbo->getTexture(0).unbind(5);
+		m_bloomFront->getTexture().unbind(6);
 		m_bloomFinalShader.getShader().end();
 		m_bloomFinal->end();
 	}
