@@ -93,7 +93,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
@@ -102,7 +102,7 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <ProgramDataBaseFileName>$(IntDir)$(TargetName)_$([System.DateTime]::Now.toString("MMddhhmmssfff")).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>$(OF)\libs\openFrameworks\;$(OF)\libs\openFrameworks\3d;$(OF)\libs\openFrameworks\app;$(OF)\libs\openFrameworks\communication;$(OF)\libs\openFrameworks\events;$(OF)\libs\openFrameworks\gl;$(OF)\libs\openFrameworks\gl\shaders;$(OF)\libs\openFrameworks\graphics;$(OF)\libs\openFrameworks\math;$(OF)\libs\openFrameworks\sound;$(OF)\libs\openFrameworks\types;$(OF)\libs\openFrameworks\utils;$(OF)\libs\openFrameworks\video;$(OF)\libs\glew\include;$(OF)\libs\boost\include;$(OF)\libs\cairo\include\cairo;$(OF)\libs\curl\include;$(OF)\libs\fmodex\include;$(OF)\libs\FreeImage\include;$(OF)\libs\freetype\include;$(OF)\libs\glfw\include;$(OF)\libs\glm\include;$(OF)\libs\json\include;$(OF)\libs\libpng;$(OF)\libs\openssl\include;$(OF)\libs\pixman;$(OF)\libs\pugixml\include;$(OF)\libs\rtAudio\include;$(OF)\libs\tess2\include;$(OF)\libs\uriparser\include;$(OF)\libs\utf8\include;$(OF)\libs\videoInput\include;$(OF)\libs\zlib;../Common;$(OF)\addons\ofxGui\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF)\libs\openFrameworks\;$(OF)\libs\openFrameworks\3d;$(OF)\libs\openFrameworks\app;$(OF)\libs\openFrameworks\communication;$(OF)\libs\openFrameworks\events;$(OF)\libs\openFrameworks\gl;$(OF)\libs\openFrameworks\gl\shaders;$(OF)\libs\openFrameworks\graphics;$(OF)\libs\openFrameworks\math;$(OF)\libs\openFrameworks\sound;$(OF)\libs\openFrameworks\types;$(OF)\libs\openFrameworks\utils;$(OF)\libs\openFrameworks\video;$(OF)\libs\glew\include;$(OF)\libs\boost\include;$(OF)\libs\cairo\include\cairo;$(OF)\libs\curl\include;$(OF)\libs\fmodex\include;$(OF)\libs\FreeImage\include;$(OF)\libs\freetype\include;$(OF)\libs\glfw\include;$(OF)\libs\glm\include;$(OF)\libs\json\include;$(OF)\libs\libpng;$(OF)\libs\openssl\include;$(OF)\libs\pixman;$(OF)\libs\pugixml\include;$(OF)\libs\rtAudio\include;$(OF)\libs\tess2\include;$(OF)\libs\uriparser\include;$(OF)\libs\utf8\include;$(OF)\libs\videoInput\include;$(OF)\libs\zlib;../Common;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,7 +141,7 @@ xcopy /Y "$(OF)\addons\libs\ofxGui_debug.lib" "..\Application\bin\$(Configuratio
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -150,7 +150,7 @@ xcopy /Y "$(OF)\addons\libs\ofxGui_debug.lib" "..\Application\bin\$(Configuratio
       <PreprocessorDefinitions>WIN32;NDEBUG;CONTENT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <ProgramDataBaseFileName>$(IntDir)$(TargetName)_$([System.DateTime]::Now.toString("MMddhhmmssfff")).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>$(OF)\libs\openFrameworks\;$(OF)\libs\openFrameworks\3d;$(OF)\libs\openFrameworks\app;$(OF)\libs\openFrameworks\communication;$(OF)\libs\openFrameworks\events;$(OF)\libs\openFrameworks\gl;$(OF)\libs\openFrameworks\gl\shaders;$(OF)\libs\openFrameworks\graphics;$(OF)\libs\openFrameworks\math;$(OF)\libs\openFrameworks\sound;$(OF)\libs\openFrameworks\types;$(OF)\libs\openFrameworks\utils;$(OF)\libs\openFrameworks\video;$(OF)\libs\glew\include;$(OF)\libs\boost\include;$(OF)\libs\cairo\include\cairo;$(OF)\libs\curl\include;$(OF)\libs\fmodex\include;$(OF)\libs\FreeImage\include;$(OF)\libs\freetype\include;$(OF)\libs\glfw\include;$(OF)\libs\glm\include;$(OF)\libs\json\include;$(OF)\libs\libpng;$(OF)\libs\openssl\include;$(OF)\libs\pixman;$(OF)\libs\pugixml\include;$(OF)\libs\rtAudio\include;$(OF)\libs\tess2\include;$(OF)\libs\uriparser\include;$(OF)\libs\utf8\include;$(OF)\libs\videoInput\include;$(OF)\libs\zlib;../Common;$(OF)\addons\ofxGui\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF)\libs\openFrameworks\;$(OF)\libs\openFrameworks\3d;$(OF)\libs\openFrameworks\app;$(OF)\libs\openFrameworks\communication;$(OF)\libs\openFrameworks\events;$(OF)\libs\openFrameworks\gl;$(OF)\libs\openFrameworks\gl\shaders;$(OF)\libs\openFrameworks\graphics;$(OF)\libs\openFrameworks\math;$(OF)\libs\openFrameworks\sound;$(OF)\libs\openFrameworks\types;$(OF)\libs\openFrameworks\utils;$(OF)\libs\openFrameworks\video;$(OF)\libs\glew\include;$(OF)\libs\boost\include;$(OF)\libs\cairo\include\cairo;$(OF)\libs\curl\include;$(OF)\libs\fmodex\include;$(OF)\libs\FreeImage\include;$(OF)\libs\freetype\include;$(OF)\libs\glfw\include;$(OF)\libs\glm\include;$(OF)\libs\json\include;$(OF)\libs\libpng;$(OF)\libs\openssl\include;$(OF)\libs\pixman;$(OF)\libs\pugixml\include;$(OF)\libs\rtAudio\include;$(OF)\libs\tess2\include;$(OF)\libs\uriparser\include;$(OF)\libs\utf8\include;$(OF)\libs\videoInput\include;$(OF)\libs\zlib;../Common;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -193,14 +193,19 @@ xcopy /Y "$(OF)\addons\libs\ofxGui.lib" "..\Application\bin\$(Configuration)\"</
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Content.h" />
-    <ClInclude Include="ContentLoader.h" />
-    <ClInclude Include="ShaderWatcher.h" />
+    <ClInclude Include="include\Content.h" />
+    <ClInclude Include="include\ContentLoader.h" />
+    <ClInclude Include="include\stdafx.h" />
+    <ClInclude Include="include\utils\ShaderWatcher.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Content.cpp" />
-    <ClCompile Include="ContentLoader.cpp" />
-    <ClCompile Include="ShaderWatcher.cpp" />
+    <ClCompile Include="src\Content.cpp" />
+    <ClCompile Include="src\ContentLoader.cpp" />
+    <ClCompile Include="src\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\utils\ShaderWatcher.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,24 +15,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ShaderWatcher.h">
+    <ClInclude Include="include\Content.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ContentLoader.h">
+    <ClInclude Include="include\ContentLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Content.h">
+    <ClInclude Include="include\utils\ShaderWatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ShaderWatcher.cpp">
+    <ClCompile Include="src\Content.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ContentLoader.cpp">
+    <ClCompile Include="src\ContentLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Content.cpp">
+    <ClCompile Include="src\utils\ShaderWatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
