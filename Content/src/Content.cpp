@@ -17,7 +17,6 @@ Content::Content():
 	m_gaussianShader.load("gaussianVert.glsl", "gaussianFrag.glsl");
 	m_bloomFinalShader.load("bloomFinalVert.glsl", "bloomFinalFrag.glsl");
 	m_dofFinalShader.load("dofFinalVert.glsl", "dofFinalFrag.glsl");
-	m_compute.load( "compute.glsl");
 
 
 	m_soundPlayer.load("theHive.mp3");
@@ -34,49 +33,11 @@ Content::Content():
 
 	// GENERATE POINTS FROM IMAGE
 	// load an image from disk
+	m_particleSim.loadCompute("compute.glsl");
 	m_image.load("paint1.png");
 	m_texture.allocate(m_image.getPixels());
-	m_mesh.setMode(OF_PRIMITIVE_POINTS);
-	// loop through the image in the x and y axes
-	for(int i = 0; i<m_numPoints; i++)
-	{
-		int x = ofRandom(float(m_image.getWidth()));
-		int y = ofRandom(float(m_image.getHeight()));
-
-
-
-		ofColor cur = m_image.getColor(x, y);
-		if (cur.a > 0) {
-			// the alpha value encodes depth, let's remap it to a good depth range
-			float z = ofMap(cur.getBrightness(), 0, 255, m_minDepth, m_maxDepth);
-			cur.a = 255;
-
-			m_mesh.addColor(cur);
-			// add offset to centre at origin
-			x -= m_image.getWidth() / 2; 
-			y -= m_image.getHeight() / 2;
-			ofVec3f pos(x, y, z);
-			m_mesh.addVertex(pos);
-
-			Point point{};
-			point.m_col = ofFloatColor(cur.r, cur.g, cur.b, cur.a);
-			point.m_pos = ofVec4f(pos.x, pos.y, pos.z, 1.);
-			point.m_vel = ofVec4f(0);
-			m_points.push_back(point);
-		}
-	}
-	m_pointsBuffer.allocate(m_points, GL_DYNAMIC_DRAW);
-	m_pointsBufferOld.allocate(m_points, GL_DYNAMIC_DRAW);
-	m_pointsVbo.setVertexBuffer(m_pointsBuffer,4,sizeof(Point));
-	m_pointsVbo.setColorBuffer(m_pointsBuffer,sizeof(Point),sizeof(ofVec4f));
-	m_pointsVbo.enableColors();
-	m_pointsVbo.disableNormals();
-	m_pointsVbo.disableIndices();
-	m_pointsVbo.disableTexCoords();
-	m_pointsBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 0);
-	m_pointsBufferOld.bindBase(GL_SHADER_STORAGE_BUFFER, 1);
-	m_texture.loadData(m_image.getPixels());
-
+	m_points = GpuParticleFactory::fromImage(m_image, m_numPoints, m_minDepth, m_maxDepth);
+	m_particleSim.loadParticles(m_points);
 
 	resetFbo();
 
@@ -90,16 +51,6 @@ Content::Content():
 
 }
 
-void Content::initSimPoints()
-{
-	m_pointsBuffer.unbindBase(GL_SHADER_STORAGE_BUFFER, 0);
-	m_pointsBufferOld.allocate(m_points, GL_DYNAMIC_DRAW);
-	m_pointsBuffer.allocate(m_points, GL_DYNAMIC_DRAW);
-	m_pointsVbo.setVertexBuffer(m_pointsBuffer,4,sizeof(Point));
-	m_pointsVbo.setColorBuffer(m_pointsBuffer,sizeof(Point),sizeof(ofVec4f));
-	m_pointsBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 0);
-	m_pointsBufferOld.bindBase(GL_SHADER_STORAGE_BUFFER, 1);
-}
 
 void Content::update()
 {
@@ -108,8 +59,6 @@ void Content::update()
 	m_gaussianShader.update();
 	m_bloomFinalShader.update();
 	m_dofFinalShader.update();
-
-	m_compute.update();
 
 	ofSoundUpdate();
 
@@ -125,27 +74,26 @@ void Content::update()
 
 	if (m_restart)
 	{
-		initSimPoints();
+		m_particleSim.reset();
 		resetFbo();
 		m_restart = false;
 	}
 
 	if (!m_pause)
 	{
-		m_compute.getShader().begin();
+		m_particleSim.begin();
 		m_texture.bindAsImage(0, GL_READ_ONLY);
-		m_compute.getShader().setUniform1i("uNumPointsSF", m_numPoints / 1024);
-		m_compute.getShader().setUniform1f("uWidth", m_particleBounds.x);
-		m_compute.getShader().setUniform1f("uHeight", m_particleBounds.y);
-		m_compute.getShader().setUniform1f("uDepth", m_particleBounds.z);
-		m_compute.getShader().setUniform1f("uTime", ofGetElapsedTimef());
-		m_compute.getShader().setUniform1f("uMinDepth", m_minDepth);
-		m_compute.getShader().setUniform1f("uMaxDepth", m_maxDepth);
-		m_compute.getShader().setUniform1i("uNumFftBands", m_numFftBands);
-		m_compute.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
-		m_compute.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);
-		m_compute.getShader().end();
-		m_pointsBuffer.copyTo(m_pointsBufferOld);
+		m_particleSim.getShader().setUniform1i("uNumPointsSF", m_numPoints / 1024);
+		m_particleSim.getShader().setUniform1f("uWidth", m_particleBounds.x);
+		m_particleSim.getShader().setUniform1f("uHeight", m_particleBounds.y);
+		m_particleSim.getShader().setUniform1f("uDepth", m_particleBounds.z);
+		m_particleSim.getShader().setUniform1f("uTime", ofGetElapsedTimef());
+		m_particleSim.getShader().setUniform1f("uMinDepth", m_minDepth);
+		m_particleSim.getShader().setUniform1f("uMaxDepth", m_maxDepth);
+		m_particleSim.getShader().setUniform1i("uNumFftBands", m_numFftBands);
+		m_particleSim.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
+		m_particleSim.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);
+		m_particleSim.updateAndEnd();
 	}
 
 
@@ -168,7 +116,7 @@ void Content::drawScene()
 {
 	m_cam.begin();
 	ofPushMatrix();
-	ofScale(1, -1, 1); 
+	ofTranslate(-m_image.getWidth() / 2, -m_image.getHeight() / 2);
 	ofEnableAlphaBlending();
 	ofSetColor(255);
 	m_constantShader.getShader().begin();
@@ -178,7 +126,7 @@ void Content::drawScene()
 	m_constantShader.getShader().setUniformMatrix4f("modelView", m_cam.getModelViewMatrix());
 	glPointSize(3);
 	m_constantShader.getShader().setUniform1f("uAlpha", 1.f);
-	m_pointsVbo.draw(GL_POINTS, 0, m_points.size());
+	m_particleSim.draw(GL_POINTS);
 	m_constantShader.getShader().end();
 	ofPopMatrix();
 	m_cam.end();
@@ -464,7 +412,6 @@ void Content::exit()
 	m_gaussianShader.exit();
 	m_bloomFinalShader.exit();
 	m_dofFinalShader.exit();
-	m_compute.exit();
 }
 
 
@@ -478,6 +425,7 @@ void Content::keyPressed(int key)
 		m_showGui = !m_showGui;
 		break;
 	case ' ':
+		m_particleSim.setPlay(m_pause);
 		m_pause = !m_pause;
 		break;
 	case 'r':

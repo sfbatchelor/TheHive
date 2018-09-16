@@ -193,12 +193,16 @@ xcopy /Y "$(OF)\addons\libs\ofxGui.lib" "..\Application\bin\$(Configuration)\"</
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\3d\Particle.h" />
+    <ClInclude Include="include\3d\ParticleSimulation.h" />
     <ClInclude Include="include\Content.h" />
     <ClInclude Include="include\ContentLoader.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\utils\ShaderWatcher.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\3d\Particle.cpp" />
+    <ClCompile Include="src\3d\ParticleSimulation.cpp" />
     <ClCompile Include="src\Content.cpp" />
     <ClCompile Include="src\ContentLoader.cpp" />
     <ClCompile Include="src\stdafx.cpp">

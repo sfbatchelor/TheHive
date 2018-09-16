@@ -1,6 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "utils\ShaderWatcher.h"
+#include "3d\ParticleSimulation.h"
 
 struct Point
 {
@@ -38,8 +39,6 @@ public:
 
 	bool isValid();
 
-	void initSimPoints();
-
 	void resetFbo();
 
 private:
@@ -64,7 +63,6 @@ private:
 	ShaderWatcher m_bloomFinalShader;
 	ShaderWatcher m_dofFinalShader;
 
-	ComputeWatcher m_compute;
 	ofMesh m_mesh;
 	ofImage m_image;
 	ofTexture m_texture;
@@ -75,10 +73,9 @@ private:
 	std::array<float, m_numFftBands> m_fftSmoothed{ {0} };
 
 
-	std::vector<Point> m_points;
-	ofBufferObject m_pointsBuffer;
-	ofBufferObject m_pointsBufferOld;
-	ofVbo m_pointsVbo;
+	std::vector<GpuParticle> m_points;
+	ParticleSimulation m_particleSim;
+
 
 	int m_numPoints;
 	float m_minDepth;
