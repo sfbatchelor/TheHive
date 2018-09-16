@@ -23,7 +23,6 @@ public:
 	void drawScene();
 	void drawInteractionArea();
 	void drawBloom( ofTexture& sceneTexture, ofTexture& highlightsTexture);
-	void drawDOF( ofTexture& sceneTexture);
 	void exit();
 
 	void keyPressed(int key);
@@ -55,7 +54,6 @@ private:
 	std::shared_ptr<ofFbo> m_gaussianFront;
 	std::shared_ptr<ofFbo> m_gaussianBack;
 	std::shared_ptr<ofFbo> m_bloomFinal;
-	std::shared_ptr<ofFbo> m_dofFinal;
 	bool m_bloomActive;
 	ofPlanePrimitive m_plane;
 

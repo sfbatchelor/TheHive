@@ -59,7 +59,6 @@ void Content::update()
 	m_constantShader.update();
 	m_gaussianShader.update();
 	m_bloomFinalShader.update();
-	m_dofFinalShader.update();
 
 	ofSoundUpdate();
 
@@ -93,7 +92,6 @@ void Content::update()
 		m_particleSim.getShader().setUniform1f("uMaxDepth", m_maxDepth);
 		m_particleSim.getShader().setUniform1i("uNumFftBands", m_numFftBands);
 		m_particleSim.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
-		m_particleSim.getShader().dispatchCompute((m_points.size() + 1024 - 1) / 1024, 1, 1);
 		m_particleSim.updateAndEnd();
 	}
 
@@ -138,11 +136,6 @@ void Content::draw()
 	///// WORLD
 	if (m_bloomActive && m_fbo)
 	{
-//		drawBloom(m_fbo->getTexture(0), m_fbo->getTexture(1));
-//		drawDOF(m_fbo->getTexture(0));
-//		m_dofFinal->getTexture().draw(0, 0);
-//		m_bloomFinal->getTexture().draw(0, 0);
-
 		m_dofPass.update(m_fbo->getTexture(0), m_fbo->getDepthTexture());
 		m_dofPass.draw(0, 0);
 	}
@@ -224,8 +217,6 @@ void Content::resetFbo()
 	settings.depthStencilInternalFormat = GL_DEPTH_COMPONENT24;
 	settings.minFilter = GL_NEAREST;
 	settings.maxFilter = GL_NEAREST;
-	//settings.wrapModeHorizontal = GL_CLAMP_TO_BORDER;
-	//settings.wrapModeVertical = GL_CLAMP_TO_BORDER;
 	m_fbo->allocate(settings);
 	m_fbo->createAndAttachTexture(GL_RGBA32F, 0);
 	m_fbo->createAndAttachTexture(GL_RGBA32F, 1);
@@ -244,9 +235,6 @@ void Content::resetFbo()
 	m_bloomFinal.reset(new ofFbo());
 	m_bloomFinal->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 	m_bloomFinal->getTexture().getTextureData().bFlipTexture = true;
-	m_dofFinal.reset(new ofFbo());
-	m_dofFinal->allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
-	m_dofFinal->getTexture().getTextureData().bFlipTexture = true;
 
 	// unit quad with normalized texels
 	m_plane.set(2. * (ofGetWidth() / ofGetHeight()), 2, 10, 10);
@@ -342,82 +330,12 @@ void Content::drawBloom( ofTexture& sceneTexture, ofTexture& highlightsTexture)
 
 }
 
-void Content::drawDOF( ofTexture& sceneTexture)
-{
-
-	//GAUSSIAN BLUR PASS
-	//first pass using the fbo result, then it switches between vertical and horizontal blur passes ping-pong style
-	bool horizontal = true, firstIteration = true;
-	int amount = 50;
-
-	m_gaussianShader.getShader().begin();
-	for (unsigned int i = 0; i < amount; i++)
-	{
-		m_gaussianShader.getShader().setUniform1i("horizontal", horizontal);
-		m_gaussianShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 5);
-		m_gaussianShader.getShader().setUniform1i("DOF", true);
-		if (horizontal)
-			m_gaussianBack->begin();
-		else
-			m_gaussianFront->begin();
-
-		if (firstIteration)
-			sceneTexture.bind(0);
-		else if (horizontal)
-			m_gaussianFront->getTexture().bind(0);
-		else
-			m_gaussianBack->getTexture().bind(0);
-
-		ofSetColor(255);
-		m_plane.enableTextures();
-		ofClear(0, 0, 0, 255);
-		m_plane.draw();
-
-		if (firstIteration)
-			sceneTexture.unbind(0);
-		else if (horizontal)
-			m_gaussianFront->getTexture().unbind(0);
-		else
-			m_gaussianBack->getTexture().unbind(0);
-		if (horizontal)
-			m_gaussianBack->end();
-		else
-			m_gaussianFront->end();
-
-		horizontal = !horizontal;
-		if (firstIteration)
-			firstIteration = false;
-	}
-	m_gaussianShader.getShader().end();
-
-
-	if (m_dofFinal)
-	{
-		//FINAL BLEND PASS
-		m_dofFinal->begin();
-		m_dofFinalShader.getShader().begin();
-		m_dofFinalShader.getShader().setUniformTexture("scene", sceneTexture, 5);
-		m_dofFinalShader.getShader().setUniformTexture("bloomBlur", m_gaussianFront->getTexture(), 6);
-		m_dofFinalShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 7);
-		ofSetColor(255);
-		m_plane.enableTextures();
-		ofClear(0, 0, 0, 255);
-		m_plane.draw();
-		m_fbo->getTexture(0).unbind(5);
-		m_gaussianFront->getTexture().unbind(6);
-		m_dofFinalShader.getShader().end();
-		m_dofFinal->end();
-	}
-
-}
-
 void Content::exit()
 {
 	m_imageShader.exit();
 	m_constantShader.exit();
 	m_gaussianShader.exit();
 	m_bloomFinalShader.exit();
-	m_dofFinalShader.exit();
 }
 
 

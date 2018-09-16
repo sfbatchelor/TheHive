@@ -39,6 +39,6 @@ void main()
    FragColor = vec4(hdrColor, 1.0);
    FragColor = vec4(bloomColor, 1.0);
    FragColor = vec4(result, 1.0);
-   //FragColor = vec4(vec3(depthVal), 1.0);
+   FragColor = vec4(vec3(depthVal), 1.0);
    //FragColor = vec4(depthDiff,0,0, 1.0);
 }  
