@@ -52,6 +52,7 @@ void main()
 		lookup.y += 1;
 	    float depthVal = LinearizeDepth(texture(depth, lookup).r);      
 		result += (vec3(depthVal)*cul); 
+		result += cul;
 	}
 	else
 		result += cul;

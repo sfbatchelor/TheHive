@@ -18,10 +18,14 @@ public:
 	ofTexture& getTexture();
 
 
-private:
+protected:
 
+	void checkAndInitialize();
+
+	bool m_isInitialized;
 	std::string m_stringName;
 	std::shared_ptr<ofFbo> m_finalBuffer;
+	ofPlanePrimitive m_plane;
 	int m_finalBufferFormat;
 	int m_width;
 	int m_height;

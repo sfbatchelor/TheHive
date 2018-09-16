@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "utils\ShaderWatcher.h"
 #include "3d\ParticleSimulation.h"
+#include "3d\DepthOfField.h"
 
 struct Point
 {
@@ -47,6 +48,10 @@ private:
 	bool m_snapshot;
 
 	std::shared_ptr<ofFbo> m_fbo;
+
+	DepthOfField m_dofPass;
+
+
 	std::shared_ptr<ofFbo> m_gaussianFront;
 	std::shared_ptr<ofFbo> m_gaussianBack;
 	std::shared_ptr<ofFbo> m_bloomFinal;

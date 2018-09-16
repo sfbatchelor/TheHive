@@ -3,7 +3,8 @@
 
 Content::Content():
 	m_particleBounds(glm::vec3(10000.)),
-	m_bloomActive(true)
+	m_bloomActive(true),
+	m_dofPass("Depth Of Field", ofGetWidth(), ofGetHeight())
 {
 	ofSetFrameRate(30);
 	ofSetLogLevel(OF_LOG_VERBOSE);
@@ -137,10 +138,13 @@ void Content::draw()
 	///// WORLD
 	if (m_bloomActive && m_fbo)
 	{
-		drawBloom(m_fbo->getTexture(0), m_fbo->getTexture(1));
+//		drawBloom(m_fbo->getTexture(0), m_fbo->getTexture(1));
 //		drawDOF(m_fbo->getTexture(0));
 //		m_dofFinal->getTexture().draw(0, 0);
-		m_bloomFinal->getTexture().draw(0, 0);
+//		m_bloomFinal->getTexture().draw(0, 0);
+
+		m_dofPass.update(m_fbo->getTexture(0));
+		m_dofPass.draw(0, 0);
 	}
 	else
 	{
@@ -247,6 +251,8 @@ void Content::resetFbo()
 	// unit quad with normalized texels
 	m_plane.set(2. * (ofGetWidth() / ofGetHeight()), 2, 10, 10);
 	m_plane.mapTexCoords(0, 0, 1., 1.);
+
+	m_dofPass.reset(ofGetWidth(), ofGetHeight());
 }
 
 void Content::drawInteractionArea()
@@ -340,7 +346,7 @@ void Content::drawDOF( ofTexture& sceneTexture)
 {
 
 	//GAUSSIAN BLUR PASS
-	//first pass using the brightness fbo result, then it switches between vertical and horizontal blur passes ping-pong style
+	//first pass using the fbo result, then it switches between vertical and horizontal blur passes ping-pong style
 	bool horizontal = true, firstIteration = true;
 	int amount = 50;
 

@@ -19,27 +19,28 @@ float LinearizeDepth(float zoverw)
 }  
 void main()
 {             
-    const float gamma = 1.5;
-	vec3 bloomColor= texture(bloomBlur, TexCoords/2.).rgb;
-    vec3 hdrColor = texture(scene, TexCoords*2).rgb;      
+    const float gamma = 0.1;
+	vec3 bloomColor= texture(bloomBlur, TexCoords).rgb;
+    vec3 hdrColor = texture(scene, TexCoords).rgb;      
     float depthVal = LinearizeDepth(texture(depth, TexCoords).r);      
 
 	// BLOOM
     hdrColor += bloomColor; // additive blending
-	//vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
+	vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
 	// DOF
 	float vfocus = clamp(focus ,0.,1.);
 	float depthDiff = length(vfocus - depthVal);
-	vec3 result = mix(hdrColor, bloomColor, 0);
+	//result = mix(hdrColor, bloomColor, 0);
 	
     // tone mapping
     // also gamma correct while we're at it       
-    //result = pow(result, vec3(1.0 / gamma));
+    result = pow(result, vec3(1.0 / gamma));
 
 
 
 
     FragColor = vec4(hdrColor, 1.0);
-    //FragColor = vec4(bloomColor, 1.0);
+   FragColor = vec4(bloomColor, 1.0);
+   FragColor = vec4(result, 1.0);
    //FragColor = vec4(depthDiff,0,0, 1.0);
 }  
