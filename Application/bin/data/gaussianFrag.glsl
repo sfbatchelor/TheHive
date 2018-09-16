@@ -51,10 +51,6 @@ void main()
 		lookup.y *= -1;
 		lookup.y += 1;
 	    float depthVal = LinearizeDepth(texture(depth, lookup).r);      
-		// DOF
-//		float vfocus = clamp(focus ,0.,1.);
-//		float dof = length(vfocus - depthVal);
-//		depthVal = max(depthVal, 0.);
 		result += (vec3(depthVal)*cul); 
 	}
 	else
@@ -62,7 +58,5 @@ void main()
 
 	FragColor = vec4(result, 1.0);
 
-    //result = texture(src, TexCoords).rgb ; // current fragment's contribution
-    //FragColor.rg =  (TexCoords)/2200;
 
 }
