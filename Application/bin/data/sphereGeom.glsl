@@ -7,7 +7,7 @@ uniform mat4 modelViewProjectionMatrix;
 uniform float minDist = 0.;
 uniform float maxDist = 6000.;
 uniform mat4 modelView;
-uniform float radius = 1.5;
+uniform float radius = 1.;
 uniform int uDivO = 7;
 uniform int uDivA = 8;
 
@@ -31,7 +31,7 @@ void main() {
     float incO = 2*M_PI / uDivO;
     float incA = M_PI /uDivA;
 	//float sRadius = (radius * vSoundVal[0])+.6;
-	float sRadius = 1.6;
+	float sRadius = 1.;
 
     //Depende del polo en el que empezemos
     for (i= 0 ; i<= uDivO; i++){

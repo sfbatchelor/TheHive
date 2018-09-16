@@ -14,7 +14,7 @@ DepthOfField::~DepthOfField()
 	m_gaussianShader.exit();
 }
 
-void DepthOfField::update(ofTexture & sourceTex)
+void DepthOfField::update(ofTexture & sourceTex, ofTexture & depthTex)
 {
 	checkAndInitialize();
 	m_dofFinalShader.update();
@@ -29,7 +29,7 @@ void DepthOfField::update(ofTexture & sourceTex)
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		m_gaussianShader.getShader().setUniform1i("horizontal", horizontal);
-		//m_gaussianShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 5);
+		m_gaussianShader.getShader().setUniformTexture("depth", depthTex, 5);
 		m_gaussianShader.getShader().setUniform1i("DOF", true);
 		if (horizontal)
 			m_gaussianBack->begin();
@@ -73,7 +73,7 @@ void DepthOfField::update(ofTexture & sourceTex)
 		m_dofFinalShader.getShader().begin();
 		m_dofFinalShader.getShader().setUniformTexture("scene", sourceTex, 5);
 		m_dofFinalShader.getShader().setUniformTexture("bloomBlur", m_gaussianFront->getTexture(), 6);
-//		m_dofFinalShader.getShader().setUniformTexture("depth", m_fbo->getDepthTexture(), 7);
+		m_dofFinalShader.getShader().setUniformTexture("depth", depthTex, 7);
 		ofSetColor(255);
 		m_plane.enableTextures();
 		ofClear(0, 0, 0, 255);

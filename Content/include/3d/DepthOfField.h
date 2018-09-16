@@ -11,7 +11,7 @@ public:
 	DepthOfField(std::string stringName, int width, int height, int finalBufferFormat = GL_RGBA);
 	~DepthOfField();
 
-	virtual void update(ofTexture& sourceTex);
+	virtual void update(ofTexture & sourceTex, ofTexture& depthTex);
 	virtual void reset(int width = 0, int height = 0);
 
 protected:

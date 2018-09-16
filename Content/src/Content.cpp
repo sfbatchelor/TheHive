@@ -143,7 +143,7 @@ void Content::draw()
 //		m_dofFinal->getTexture().draw(0, 0);
 //		m_bloomFinal->getTexture().draw(0, 0);
 
-		m_dofPass.update(m_fbo->getTexture(0));
+		m_dofPass.update(m_fbo->getTexture(0), m_fbo->getDepthTexture());
 		m_dofPass.draw(0, 0);
 	}
 	else

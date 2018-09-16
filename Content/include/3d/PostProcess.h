@@ -11,7 +11,7 @@ public:
 	~PostProcess();
 
 	virtual void draw(float x, float y);
-	virtual void update(ofTexture& sourceTex) = 0;
+	virtual void update(ofTexture & sourceTex, ofTexture& depthTex) = 0;
 	virtual void reset(int width = 0, int height = 0);
 
 	std::string getName();
