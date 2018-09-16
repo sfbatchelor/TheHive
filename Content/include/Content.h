@@ -3,6 +3,7 @@
 #include "utils\ShaderWatcher.h"
 #include "3d\ParticleSimulation.h"
 #include "3d\DepthOfField.h"
+#include "3d\Bloom.h"
 
 struct Point
 {
@@ -22,7 +23,6 @@ public:
 
 	void drawScene();
 	void drawInteractionArea();
-	void drawBloom( ofTexture& sceneTexture, ofTexture& highlightsTexture);
 	void exit();
 
 	void keyPressed(int key);
@@ -49,22 +49,14 @@ private:
 	std::shared_ptr<ofFbo> m_fbo;
 
 	DepthOfField m_dofPass;
-
-
-	std::shared_ptr<ofFbo> m_gaussianFront;
-	std::shared_ptr<ofFbo> m_gaussianBack;
-	std::shared_ptr<ofFbo> m_bloomFinal;
+	Bloom m_bloomPass;
 	bool m_bloomActive;
-	ofPlanePrimitive m_plane;
 
 	ofEasyCam m_cam;
 	bool m_showGui;
 
 	ShaderWatcher m_imageShader;
 	ShaderWatcher m_constantShader;
-	ShaderWatcher m_gaussianShader;
-	ShaderWatcher m_bloomFinalShader;
-	ShaderWatcher m_dofFinalShader;
 
 	ofMesh m_mesh;
 	ofImage m_image;

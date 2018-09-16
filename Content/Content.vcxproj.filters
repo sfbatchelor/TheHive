@@ -39,6 +39,9 @@
     <ClInclude Include="include\3d\DepthOfField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\3d\Bloom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Content.cpp">
@@ -63,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\3d\DepthOfField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\3d\Bloom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
