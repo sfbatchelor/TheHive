@@ -17,13 +17,20 @@ public:
 	virtual void reset();
 
 
+
 protected:
+
+	void generatePolyLine();
 
 	std::vector<std::shared_ptr<ofRectangle>> m_bars;
 	int m_barWidth;
 	int m_barXSpacing;
 	int m_barMaxY;
 	ofEasyCam m_cam;
+	int m_radius;
+
+	ofPolyline m_line;
+
 
 
 };

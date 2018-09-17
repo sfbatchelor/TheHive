@@ -13,6 +13,8 @@ DebugAudio::DebugAudio(std::shared_ptr<Fft> soundData):
 		int height = m_soundData->m_fftSmoothed[i] * m_barMaxY;
 		m_bars.push_back(std::shared_ptr<ofRectangle>(new ofRectangle(x, ofGetHeight(), m_barWidth, -height )));
 	}
+
+
 }
 
 DebugAudio::~DebugAudio()
