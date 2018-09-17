@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Content.h"
 #include "layers\ParticleExplosion.h"
+#include "layers\CircularBars.h"
+#include "layers\DebugAudio.h"
 
 Content::Content():
 	m_bloomActive(true),
@@ -17,7 +19,7 @@ Content::Content():
 
 	m_soundPlayer.load("theHive.mp3");
 	m_soundPlayer.setLoop(true);
-	//m_soundPlayer.play();
+	m_soundPlayer.play();
 	m_soundPlayer.setPosition(.3);
 
 	m_pause = false;
@@ -29,7 +31,9 @@ Content::Content():
 	m_dofPass.reset();
 	m_bloomPass.reset();
 
-	m_layers.push_back(std::shared_ptr<ParticleExplosion>(new ParticleExplosion(m_soundData)));
+	//m_layers.push_back(std::shared_ptr<ParticleExplosion>(new ParticleExplosion(m_soundData)));
+	m_layers.push_back(std::shared_ptr<CircularBars>(new CircularBars(m_soundData)));
+	//m_layers.push_back(std::shared_ptr<DebugAudio>(new DebugAudio(m_soundData)));
 }
 
 

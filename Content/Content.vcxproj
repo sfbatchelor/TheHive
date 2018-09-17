@@ -201,6 +201,8 @@ xcopy /Y "$(OF)\addons\libs\ofxGui.lib" "..\Application\bin\$(Configuration)\"</
     <ClInclude Include="include\Content.h" />
     <ClInclude Include="include\ContentLoader.h" />
     <ClInclude Include="include\layers\AudioGraphicsLayer.h" />
+    <ClInclude Include="include\layers\CircularBars.h" />
+    <ClInclude Include="include\layers\DebugAudio.h" />
     <ClInclude Include="include\layers\Layer.h" />
     <ClInclude Include="include\layers\ParticleExplosion.h" />
     <ClInclude Include="include\stdafx.h" />
@@ -209,6 +211,8 @@ xcopy /Y "$(OF)\addons\libs\ofxGui.lib" "..\Application\bin\$(Configuration)\"</
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\3d\Bloom.cpp" />
+    <ClCompile Include="src\layers\DebugAudio.cpp" />
+    <ClCompile Include="src\layers\CircularBars.cpp" />
     <ClCompile Include="src\layers\ParticleExplosion.cpp" />
     <ClCompile Include="src\layers\AudioGraphicsLayer.cpp" />
     <ClCompile Include="src\layers\Layer.cpp" />

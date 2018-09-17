@@ -54,6 +54,12 @@
     <ClInclude Include="include\layers\ParticleExplosion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\layers\CircularBars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\layers\DebugAudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Content.cpp">
@@ -90,6 +96,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\layers\ParticleExplosion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\layers\CircularBars.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\layers\DebugAudio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
