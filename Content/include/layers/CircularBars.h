@@ -22,7 +22,6 @@ protected:
 
 	void generatePolyLine();
 
-	std::vector<std::shared_ptr<ofRectangle>> m_bars;
 	int m_barWidth;
 	int m_barXSpacing;
 	int m_barMaxY;
@@ -30,6 +29,7 @@ protected:
 	int m_radius;
 
 	ofPolyline m_line;
+	std::vector<ofPolyline> m_bars;
 
 
 

@@ -20,11 +20,12 @@ void CircularBars::draw()
 	m_cam.begin();
 	ofSetColor(255);
 	ofPushMatrix();
+	ofRotateZDeg(60 * sin(ofGetElapsedTimef()));
 	m_line.draw();
-	ofRotateZDeg(10);
-	m_line.draw();
+	for (auto bar : m_bars)
+		bar.draw();
 	ofScale(1, -1, 1);
-	ofRotateZDeg(12);
+	ofRotateZDeg(120*cos(ofGetElapsedTimef()));
 	m_line.draw();
 	ofPopMatrix();
 	m_cam.end();
@@ -50,7 +51,10 @@ void CircularBars::generatePolyLine()
 		int height = m_soundData->m_fftSmoothed[i] * m_barMaxY;
 		int y = glm::cos(glm::radians(angle*i))*(m_radius+height);
 		int x = glm::sin(glm::radians(angle*i))*(m_radius+height);
+		x += ofRandom(-10, 10);
+		x += ofRandom(-10, 10);
 		m_line.addVertex(x, y);
+
 	}
 	//loop back
 	int height = m_soundData->m_fftSmoothed[0] * m_barMaxY;
