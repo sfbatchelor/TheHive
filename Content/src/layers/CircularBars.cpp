@@ -51,10 +51,12 @@ void CircularBars::generatePolyLine()
 	m_line.clear();
 	for (int i = 0; i < m_soundData->m_numFftBands/4; i++)
 	{
+		float radius = m_radius;
+		radius += m_radius*m_soundData->m_fftSmoothed[0];
 
 		int height = m_soundData->m_fftSmoothed[i] * m_barMaxY;
-		int y = glm::cos(glm::radians(angle*i))*(m_radius+height);
-		int x = glm::sin(glm::radians(angle*i))*(m_radius+height);
+		int y = glm::cos(glm::radians(angle*i))*(radius+height);
+		int x = glm::sin(glm::radians(angle*i))*(radius+height);
 		x += ofRandom(-10, 10);
 		x += ofRandom(-10, 10);
 		m_line.addVertex(x, y);
