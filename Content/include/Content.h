@@ -4,6 +4,8 @@
 #include "3d\ParticleSimulation.h"
 #include "3d\DepthOfField.h"
 #include "3d\Bloom.h"
+#include "layers\Layer.h"
+#include "utils\Fft.h"
 
 struct Point
 {
@@ -38,48 +40,31 @@ public:
 	void gotMessage(ofMessage msg);
 
 	bool isValid();
-
 	void resetFbo();
+
+	void drawLayers();
+	void updateLayers();
+	void resetLayers();
+	void setPlayLayers(bool playState);
 
 private:
 
 	ofImage m_screenGrab;
 	bool m_snapshot;
-
 	std::shared_ptr<ofFbo> m_fbo;
-
 	DepthOfField m_dofPass;
 	Bloom m_bloomPass;
 	bool m_bloomActive;
 
-	ofEasyCam m_cam;
 	bool m_showGui;
 
-	ShaderWatcher m_imageShader;
-	ShaderWatcher m_constantShader;
-
-	ofMesh m_mesh;
-	ofImage m_image;
-	ofTexture m_texture;
-
+	std::vector<std::shared_ptr<Layer>> m_layers;
 
 	ofSoundPlayer m_soundPlayer;
-	static constexpr size_t m_numFftBands = 512;
-	std::array<float, m_numFftBands> m_fftSmoothed{ {0} };
+	std::shared_ptr<Fft> m_soundData;
 
-
-	std::vector<GpuParticle> m_points;
-	ParticleSimulation m_particleSim;
-
-
-	int m_numPoints;
-	float m_minDepth;
-	float m_maxDepth;
 
 	bool m_pause;
 	bool m_restart;
-
-	glm::vec3 m_particleBounds;
-
 
 };

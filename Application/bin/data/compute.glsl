@@ -162,7 +162,6 @@ void main(){
 
 
 
-
 // COLOUR COHESION
 	// 1- find the closest matching pixel colour in an area, set that pixel pos to be the new 'target'
 	float closestColL = 100000.;
@@ -214,46 +213,9 @@ void main(){
 		if(i!=gl_GlobalInvocationID.x){
 			// significance based on distance away
 			Point samplePoint = pp[i];
-//			vec3 distVec = samplePoint.pos.xyz - point.pos.xyz;
-//			float dist = length(distVec);
-//			if(dist < uAlignPointSampleRadius) // only points within a certain radius
-//			{
-//				float distSig= 1. - (dist-uNearAlignDist / uFarAlignDist - uNearAlignDist);
-//			
-//				// work out heading-correction
-//				vec3 sDir = safeNormalize(samplePoint.vel.xyz);
-//				float hc = 1. - dot(pDir, sDir);
-//				//compute fuzzy-heading
-//				if(leftOrRight(pDir, sDir) == 1)
-//					fuzzyHeading += correctionRt *hc* distSig;
-//				else
-//					fuzzyHeading -= correctionRt*hc* distSig;
-//
-//				//compute fuzzy-speed & speed correction
-//				vec3 speedDiffV = samplePoint.vel.xyz - point.vel.xyz;
-//				float speedDiffF = length(speedDiffV);
-//				float sc = clamp( max(speedDiffF,0.)/ uAlignSpeedDiffMax, 0,  uAlignSpeedDiffMax);
-//				fuzzySpeed += speedDiffV* sc * distSig * uAlignSpeedMag;
-//			}
-//			if(dist < uSeperationPointSampleRadius) // only points within a certain radius
-//			{
-//
-//				float colDiff = length(samplePoint.col.rgb - point.col.rgb);
-//				float colSig = colDiff/255.; //force is less the more similar they are
-//				float distSig = 1. - (dist / uSepFalloffDist); // force is less the further away the point is
-//				distSig*= uSepDistMag;
-//				vec3 sepDir = -safeNormalize(distVec); // repulsive so minus the direction
-//				seperation += sepDir*colSig *distSig;
-//
-//			}
-//
-
-
 			totalAccel += rule1(point.pos.xyz, samplePoint.pos.xyz) * .007;
 			totalAccel += rule2(point.pos.xyz,samplePoint.pos.xyz, samplePoint.vel.xyz, samplePoint.vel.xyz) * 50;
 			totalAccel += rule3(point.pos.xyz,samplePoint.pos.xyz) *.0018 ;
-			
-
 		}
 	}
 
@@ -261,11 +223,7 @@ void main(){
 	noiseDir.y = (noise(point.pos.xx/1000) - .5)*.2;
 	noiseDir.z = (noise(point.pos.xz/1000) - .5)*.2;
 
-//	totalAccel += fuzzySpeed;
-//	totalAccel += fuzzyHeading;
-//	totalAccel += seperation;
 
-// FUZZY-ALLIGNMENT COLOUR 
 
 
 // SOUND STUFF
@@ -304,10 +262,6 @@ void main(){
 	else 
 		point.pos += point.vel;
 
-	
-	//point.pos.xyz += noiseDir*10;
-
-	//point.col.rg = (.7 + normalize(point.vel.xy) * .5)*255.;
 
 // WRITE OUT
 	np[gl_GlobalInvocationID.x ] = point;

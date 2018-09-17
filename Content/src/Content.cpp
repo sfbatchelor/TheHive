@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "Content.h"
+#include "layers\ParticleExplosion.h"
 
 Content::Content():
-	m_particleBounds(glm::vec3(10000.)),
 	m_bloomActive(true),
 	m_dofPass("Depth Of Field", ofGetWidth(), ofGetHeight()),
-	m_bloomPass("Bloom", ofGetWidth(), ofGetHeight())
+	m_bloomPass("Bloom", ofGetWidth(), ofGetHeight()),
+	m_soundData(new Fft())
 {
 	ofSetFrameRate(30);
 	ofSetLogLevel(OF_LOG_VERBOSE);
@@ -13,9 +14,6 @@ Content::Content():
 	ofSetWindowTitle("The Hive");
 	m_snapshot = false;
 	m_showGui = true;
-	m_numPoints = 1024 * 38;
-	m_constantShader.load("constantVert.glsl", "constantFrag.glsl", "sphereGeom.glsl");
-	m_imageShader.load("imageVert.glsl", "imageFrag.glsl");
 
 	m_soundPlayer.load("theHive.mp3");
 	m_soundPlayer.setLoop(true);
@@ -24,73 +22,41 @@ Content::Content():
 
 	m_pause = false;
 	m_restart = false;
-
-	m_minDepth = -300.;
-	m_maxDepth = 300.;
-
-
-	// GENERATE POINTS FROM IMAGE
-	// load an image from disk
-	m_particleSim.loadCompute("compute.glsl");
-	m_image.load("paint1.png");
-	m_texture.allocate(m_image.getPixels());
-	m_points = GpuParticleFactory::fromImage(m_image, m_numPoints, m_minDepth, m_maxDepth);
-	m_particleSim.loadParticles(m_points);
-
 	resetFbo();
-
-	// SETUP RAY BUFFER ON GPU
-	m_cam.setVFlip(true); //flip for upside down image
-	m_cam.setFarClip(100000000.);
 
 	ofEnableDepthTest();
 	ofSetBackgroundColor(10, 10, 10);
 	m_dofPass.reset();
 	m_bloomPass.reset();
+
+	m_layers.push_back(std::shared_ptr<ParticleExplosion>(new ParticleExplosion(m_soundData)));
 }
 
 
 void Content::update()
 {
-	m_imageShader.update();
-	m_constantShader.update();
 	m_dofPass.update(m_fbo->getTexture(0), m_fbo->getDepthTexture());
 	m_bloomPass.update(m_fbo->getTexture(0), m_fbo->getDepthTexture());
 	ofSoundUpdate();
 
 	//  grab the fft, and put in into a "smoothed" array,
 	//	by taking maximums, as peaks and then smoothing downward
-	float * val = ofSoundGetSpectrum(m_numFftBands);		// request 128 values for fft
-	for (int i = 0; i < m_numFftBands; i++) {
+	float * val = ofSoundGetSpectrum(m_soundData->m_numFftBands);		// request 128 values for fft
+	for (int i = 0; i < m_soundData->m_numFftBands; i++) {
 		// let the smoothed value sink to zero:
-		m_fftSmoothed[i] *= 0.96f;
+		m_soundData->m_fftSmoothed[i] *= 0.96f;
 		// take the max, either the smoothed or the incoming:
-		if (m_fftSmoothed[i] < val[i]) m_fftSmoothed[i] = val[i];
+		if (m_soundData->m_fftSmoothed[i] < val[i]) m_soundData->m_fftSmoothed[i] = val[i];
 	}
 
 	if (m_restart)
 	{
-		m_particleSim.reset();
+		resetLayers();
 		resetFbo();
 		m_restart = false;
 	}
 
-	if (!m_pause)
-	{
-		m_particleSim.begin();
-		m_texture.bindAsImage(0, GL_READ_ONLY);
-		m_particleSim.getShader().setUniform1i("uNumPointsSF", m_numPoints / 1024);
-		m_particleSim.getShader().setUniform1f("uWidth", m_particleBounds.x);
-		m_particleSim.getShader().setUniform1f("uHeight", m_particleBounds.y);
-		m_particleSim.getShader().setUniform1f("uDepth", m_particleBounds.z);
-		m_particleSim.getShader().setUniform1f("uTime", ofGetElapsedTimef());
-		m_particleSim.getShader().setUniform1f("uMinDepth", m_minDepth);
-		m_particleSim.getShader().setUniform1f("uMaxDepth", m_maxDepth);
-		m_particleSim.getShader().setUniform1i("uNumFftBands", m_numFftBands);
-		m_particleSim.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
-		m_particleSim.updateAndEnd();
-	}
-
+	updateLayers();
 
 
 	if (m_bloomActive && m_fbo)
@@ -107,22 +73,7 @@ void Content::update()
 
 void Content::drawScene()
 {
-	m_cam.begin();
-	ofPushMatrix();
-	ofTranslate(-m_image.getWidth() / 2, -m_image.getHeight() / 2);
-	ofEnableAlphaBlending();
-	ofSetColor(255);
-	m_constantShader.getShader().begin();
-	m_constantShader.getShader().setUniform1i("uNumFftBands", m_numFftBands);
-	m_constantShader.getShader().setUniform1fv("uFft", &m_fftSmoothed[0], m_numFftBands);
-	m_constantShader.getShader().setUniform1f("uTime", ofGetElapsedTimef());
-	m_constantShader.getShader().setUniformMatrix4f("modelView", m_cam.getModelViewMatrix());
-	glPointSize(3);
-	m_constantShader.getShader().setUniform1f("uAlpha", 1.f);
-	m_particleSim.draw(GL_POINTS);
-	m_constantShader.getShader().end();
-	ofPopMatrix();
-	m_cam.end();
+	drawLayers();
 }
 
 void Content::draw()
@@ -146,26 +97,9 @@ void Content::draw()
 		m_snapshot = false;
 	}
 
-	if (m_showGui)
-	{
-		m_cam.begin();
-
-		ofSetColor(255, 100);
-		ofDrawGrid(5000, 5, true, true, true, true);
-		m_cam.end();
-	}
-
-
 	///// GUI
 	if (m_showGui)
 	{
-
-		m_cam.begin();
-		ofNoFill();
-		ofSetColor(255);
-		ofDrawBox(0, 0, 0, m_particleBounds.x, m_particleBounds.y, m_particleBounds.z);
-		ofFill();
-		m_cam.end();
 
 		stringstream ss;
 		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
@@ -227,6 +161,38 @@ void Content::resetFbo()
 	m_bloomPass.reset(ofGetWidth(), ofGetHeight());
 }
 
+void Content::drawLayers()
+{
+	for (auto layer : m_layers)
+	{
+		layer->draw();
+	}
+}
+
+void Content::updateLayers()
+{
+	for (auto layer : m_layers)
+	{
+		layer->update();
+	}
+}
+
+void Content::resetLayers()
+{
+	for (auto layer : m_layers)
+	{
+		layer->reset();
+	}
+}
+
+void Content::setPlayLayers(bool playState)
+{
+	for (auto layer : m_layers)
+	{
+		layer->setPlay(playState);
+	}
+}
+
 void Content::drawInteractionArea()
 {
 	ofRectangle vp = ofGetCurrentViewport();
@@ -248,8 +214,6 @@ void Content::drawInteractionArea()
 
 void Content::exit()
 {
-	m_imageShader.exit();
-	m_constantShader.exit();
 }
 
 
@@ -263,7 +227,7 @@ void Content::keyPressed(int key)
 		m_showGui = !m_showGui;
 		break;
 	case ' ':
-		m_particleSim.setPlay(m_pause);
+		setPlayLayers(m_pause);
 		m_pause = !m_pause;
 		break;
 	case 'r':

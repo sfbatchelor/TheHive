@@ -200,11 +200,18 @@ xcopy /Y "$(OF)\addons\libs\ofxGui.lib" "..\Application\bin\$(Configuration)\"</
     <ClInclude Include="include\3d\PostProcess.h" />
     <ClInclude Include="include\Content.h" />
     <ClInclude Include="include\ContentLoader.h" />
+    <ClInclude Include="include\layers\AudioGraphicsLayer.h" />
+    <ClInclude Include="include\layers\Layer.h" />
+    <ClInclude Include="include\layers\ParticleExplosion.h" />
     <ClInclude Include="include\stdafx.h" />
+    <ClInclude Include="include\utils\Fft.h" />
     <ClInclude Include="include\utils\ShaderWatcher.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\3d\Bloom.cpp" />
+    <ClCompile Include="src\layers\ParticleExplosion.cpp" />
+    <ClCompile Include="src\layers\AudioGraphicsLayer.cpp" />
+    <ClCompile Include="src\layers\Layer.cpp" />
     <ClCompile Include="src\3d\DepthOfField.cpp" />
     <ClCompile Include="src\3d\PostProcess.cpp" />
     <ClCompile Include="src\3d\Particle.cpp" />
