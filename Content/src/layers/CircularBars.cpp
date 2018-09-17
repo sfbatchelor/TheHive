@@ -5,8 +5,8 @@ CircularBars::CircularBars(std::shared_ptr<Fft> soundData ):
 	AudioGraphicsLayer(soundData, "CircularBars"),
 	m_barWidth(5),
 	m_barXSpacing(5),
-	m_barMaxY(700),
-	m_radius(700)
+	m_barMaxY(900),
+	m_radius(600)
 {
 	generatePolyLine();
 }
@@ -20,12 +20,16 @@ void CircularBars::draw()
 	m_cam.begin();
 	ofSetColor(255);
 	ofPushMatrix();
-	ofRotateZDeg(60 * sin(ofGetElapsedTimef()));
+	ofRotateZDeg(60 * sin(ofGetElapsedTimef()*.1));
 	m_line.draw();
 	for (auto bar : m_bars)
 		bar.draw();
 	ofScale(1, -1, 1);
-	ofRotateZDeg(120*cos(ofGetElapsedTimef()));
+	ofRotateZDeg(120*cos(ofGetElapsedTimef()*.1));
+	m_line.draw();
+
+	ofScale(-1, -2*sin(cos(ofGetElapsedTimef())), 1);
+	ofRotateZDeg(20*tan(ofGetElapsedTimef()*.1));
 	m_line.draw();
 	ofPopMatrix();
 	m_cam.end();
@@ -43,9 +47,9 @@ void CircularBars::reset()
 
 void CircularBars::generatePolyLine()
 {
-	float angle = glm::fract(ofGetElapsedTimef())*26000. / m_soundData->m_numFftBands;
+	float angle = glm::fract(ofGetElapsedTimef()*.3)*36000. / m_soundData->m_numFftBands/4;
 	m_line.clear();
-	for (int i = 0; i < m_soundData->m_numFftBands; i++)
+	for (int i = 0; i < m_soundData->m_numFftBands/4; i++)
 	{
 
 		int height = m_soundData->m_fftSmoothed[i] * m_barMaxY;
