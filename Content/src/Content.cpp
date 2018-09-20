@@ -2,6 +2,7 @@
 #include "Content.h"
 #include "layers\ParticleExplosion.h"
 #include "layers\CircularBars.h"
+#include "layers\CircularNormals.h"
 #include "layers\DebugAudio.h"
 
 Content::Content():
@@ -33,6 +34,7 @@ Content::Content():
 
 	//m_layers.push_back(std::shared_ptr<ParticleExplosion>(new ParticleExplosion(m_soundData)));
 	m_layers.push_back(std::shared_ptr<CircularBars>(new CircularBars(m_soundData)));
+	m_layers.push_back(std::shared_ptr<CircularNormals>(new CircularNormals(m_soundData)));
 	//m_layers.push_back(std::shared_ptr<DebugAudio>(new DebugAudio(m_soundData)));
 }
 

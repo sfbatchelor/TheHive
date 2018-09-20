@@ -60,6 +60,9 @@
     <ClInclude Include="include\layers\DebugAudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\layers\CircularNormals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Content.cpp">
@@ -102,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\layers\DebugAudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\layers\CircularNormals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

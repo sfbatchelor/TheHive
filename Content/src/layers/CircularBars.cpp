@@ -6,7 +6,7 @@ CircularBars::CircularBars(std::shared_ptr<Fft> soundData ):
 	m_barWidth(5),
 	m_barXSpacing(5),
 	m_barMaxY(900),
-	m_radius(600)
+	m_radius(400)
 {
 	generatePolyLine();
 }
@@ -18,12 +18,11 @@ CircularBars::~CircularBars()
 void CircularBars::draw()
 {
 	m_cam.begin();
+	ofSetLineWidth(3);
 	ofSetColor(255);
 	ofPushMatrix();
 	ofRotateZDeg(60 * sin(ofGetElapsedTimef()*.1));
 	m_line.draw();
-	for (auto bar : m_bars)
-		bar.draw();
 	ofScale(1, -1, 1);
 	ofRotateZDeg(120*cos(ofGetElapsedTimef()*.1));
 	m_line.draw();
@@ -58,7 +57,7 @@ void CircularBars::generatePolyLine()
 		int y = glm::cos(glm::radians(angle*i))*(radius+height);
 		int x = glm::sin(glm::radians(angle*i))*(radius+height);
 		x += ofRandom(-10, 10);
-		x += ofRandom(-10, 10);
+		y += ofRandom(-10, 10);
 		m_line.addVertex(x, y);
 
 	}

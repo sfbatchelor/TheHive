@@ -29,7 +29,6 @@ protected:
 	int m_radius;
 
 	ofPolyline m_line;
-	std::vector<ofPolyline> m_bars;
 
 
 
