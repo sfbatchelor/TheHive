@@ -100,7 +100,7 @@ void ShaderWatcher::exit()
 const ofShader& ShaderWatcher::getShader() const
 {
 	ofScopedLock(m_mutex);
-	return m_frontShader;
+	return m_frontShader; //todo  - think this is actually bad, ofShader resrc gets used outside if lock!
 }
 
 void ShaderWatcher::onFileWasModified()

@@ -27,7 +27,7 @@ void CircularBars::draw()
 	ofRotateZDeg(120*cos(ofGetElapsedTimef()*.1));
 	m_line.draw();
 
-	ofScale(-1, -2*sin(cos(ofGetElapsedTimef())), 1);
+	ofScale(-1, -1, 1);
 	ofRotateZDeg(20*tan(ofGetElapsedTimef()*.1));
 	m_line.draw();
 	ofPopMatrix();
@@ -46,7 +46,7 @@ void CircularBars::reset()
 
 void CircularBars::generatePolyLine()
 {
-	float angle = glm::fract(ofGetElapsedTimef()*.3)*36000. / m_soundData->m_numFftBands/4;
+	float angle = glm::fract(ofGetElapsedTimef()*.6)*36000. / m_soundData->m_numFftBands/4;
 	m_line.clear();
 	for (int i = 0; i < m_soundData->m_numFftBands/4; i++)
 	{

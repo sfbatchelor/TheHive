@@ -5,9 +5,9 @@ CircularNormals::CircularNormals(std::shared_ptr<Fft> soundData ):
 	AudioGraphicsLayer(soundData, "CircularNormals"),
 	m_lineWidth(5),
 	m_lineXSpacing(5),
-	m_lineMaxY(300),
-	m_radius(200),
-	m_lineCount(200)
+	m_lineMaxY(200),
+	m_radius(500),
+	m_lineCount(300)
 {
 	generateLines();
 }
@@ -26,15 +26,10 @@ void CircularNormals::draw()
 
 	for (auto line : m_lines)
 		line->draw();
-	ofScale(-1, 1, 1);
+	ofScale(-1, -1, 1);
 	for (auto line : m_lines)
 		line->draw();
 
-	for (auto line : m_lines)
-		line->draw();
-	ofScale(-1, 1, 1);
-	for (auto line : m_lines)
-		line->draw();
 
 	ofPopMatrix();
 	m_cam.end();
@@ -72,8 +67,8 @@ void CircularNormals::generateLines()
 		line.addVertex(x, y);
 
 		// get bottom point 
-		y = glm::cos(glm::radians(angle*i))*(radius-height);
-		x = glm::sin(glm::radians(angle*i))*(radius-height);
+		y = glm::cos(glm::radians(angle*i))*(radius-(height*2));
+		x = glm::sin(glm::radians(angle*i))*(radius-(height*2));
 		line.addVertex(x, y);
 
 		// add to container
@@ -99,7 +94,7 @@ void CircularNormals::updateLines()
 
 		int height = soundVal * m_lineMaxY;
 		height *= 2;
-		radius += m_radius * soundVal*2; // offset from centre depoending on sound val
+		radius += m_radius * soundVal*7; // offset from centre depoending on sound val
 
 
 
@@ -110,8 +105,8 @@ void CircularNormals::updateLines()
 		line->getVertices()[0].y = y;
 
 		// get bottom point 
-		y = glm::cos(glm::radians(angle*i))*(radius-height);
-		x = glm::sin(glm::radians(angle*i))*(radius-height);
+		y = glm::cos(glm::radians(angle*i))*(radius-(height*4));
+		x = glm::sin(glm::radians(angle*i))*(radius-(height*4));
 		line->getVertices()[1].x = x; 
 		line->getVertices()[1].y = y; 
 		i++;
