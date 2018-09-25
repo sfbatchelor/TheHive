@@ -11,7 +11,11 @@ uniform int uYDivisions = 2;
 
 void main()
 {             
+	vec2 uv = TexCoords.xy;
+	uv.x *= uXDivisions;
+	uv.y *= uYDivisions;
+	uv = fract(uv);
 
-	vec2 uv = TexCoords /100000.;
-    FragColor = vec4(0);
+
+    FragColor = vec4(uv, .0, 1);
 }  
