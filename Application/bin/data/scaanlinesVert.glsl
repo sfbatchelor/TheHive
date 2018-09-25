@@ -9,6 +9,6 @@ out vec2 TexCoords;
 void main()
 {
     TexCoords = texcoord;
-    gl_Position = ( position);
+    gl_Position = (position);
 }
 

@@ -25,5 +25,20 @@
     <None Include="bin\data\constantVert.glsl" />
     <None Include="bin\data\constantFrag.glsl" />
     <None Include="bin\data\sphereGeom.glsl" />
+    <None Include="bin\data\scaanlinesVert.glsl" />
+    <None Include="bin\data\scanlinesFrag.glsl" />
+    <None Include="bin\data\imageVert.glsl" />
+    <None Include="bin\data\dofFinalFrag.glsl" />
+    <None Include="bin\data\dofFinalVert.glsl" />
+    <None Include="bin\data\gaussianFrag.glsl" />
+    <None Include="bin\data\gaussianVert.glsl" />
+    <None Include="bin\data\highlightFrag.glsl" />
+    <None Include="bin\data\highlightVert.glsl" />
+    <None Include="bin\data\imageFrag.glsl" />
+    <None Include="bin\data\bloomFinalVert.glsl" />
+    <None Include="bin\data\bloomFinalFrag.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bin\data\aMadHeart.jpg" />
   </ItemGroup>
 </Project>

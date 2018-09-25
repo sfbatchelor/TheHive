@@ -13,8 +13,6 @@ uniform float uTime = 0.8;
 
 void main() {
 
-
-
 	vec4 texCol = texture(tex0, Texcoord);
 	outputColor = texCol;
 	//outputColor = vec4(1,0,0,1);

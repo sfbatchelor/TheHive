@@ -4,7 +4,9 @@
 Scanlines::Scanlines(std::shared_ptr<Fft> soundData):
 	AudioGraphicsLayer(soundData, "Scanlines"),
 	m_width(ofGetWidth()),
-	m_height(ofGetHeight())
+	m_height(ofGetHeight()),
+	m_xDivisions(2),
+	m_yDivisions(2)
 {
 	m_shader.load("scanlinesVert.glsl", "scanlinesFrag.glsl");
 }
@@ -18,8 +20,11 @@ void Scanlines::draw()
 {
 	m_shader.getShader().begin();
 	m_shader.getShader().setUniform1i("uNumFftBands", m_soundData->m_numFftBands);
+	m_shader.getShader().setUniform1i("uXDivisions", m_xDivisions);
+	m_shader.getShader().setUniform1i("uYDivisions", m_yDivisions);
 	m_shader.getShader().setUniform1fv("uFft", &m_soundData->m_fftSmoothed[0], m_soundData->m_numFftBands);
 	m_shader.getShader().setUniform1f("uTime", ofGetElapsedTimef());
+	m_fullscreenQuad.enableTextures();
 	m_fullscreenQuad.draw();
 	m_shader.getShader().end();
 }

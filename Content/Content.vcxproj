@@ -206,12 +206,14 @@ xcopy /Y "$(OF)\addons\libs\ofxGui.lib" "..\Application\bin\$(Configuration)\"</
     <ClInclude Include="include\layers\DebugAudio.h" />
     <ClInclude Include="include\layers\Layer.h" />
     <ClInclude Include="include\layers\ParticleExplosion.h" />
+    <ClInclude Include="include\layers\Scanlines.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\utils\Fft.h" />
     <ClInclude Include="include\utils\ShaderWatcher.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\3d\Bloom.cpp" />
+    <ClCompile Include="src\layers\Scanlines.cpp" />
     <ClCompile Include="src\layers\CircularNormals.cpp" />
     <ClCompile Include="src\layers\DebugAudio.cpp" />
     <ClCompile Include="src\layers\CircularBars.cpp" />

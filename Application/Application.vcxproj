@@ -201,9 +201,24 @@ C:\_dev\openFrameworks\addons\ofxGui\src;%(AdditionalIncludeDirectories)</Additi
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="bin\data\bloomFinalFrag.glsl" />
+    <None Include="bin\data\bloomFinalVert.glsl" />
     <None Include="bin\data\constantFrag.glsl" />
     <None Include="bin\data\constantVert.glsl" />
+    <None Include="bin\data\dofFinalFrag.glsl" />
+    <None Include="bin\data\dofFinalVert.glsl" />
+    <None Include="bin\data\gaussianFrag.glsl" />
+    <None Include="bin\data\gaussianVert.glsl" />
+    <None Include="bin\data\highlightFrag.glsl" />
+    <None Include="bin\data\highlightVert.glsl" />
+    <None Include="bin\data\imageFrag.glsl" />
+    <None Include="bin\data\imageVert.glsl" />
+    <None Include="bin\data\scaanlinesVert.glsl" />
+    <None Include="bin\data\scanlinesFrag.glsl" />
     <None Include="bin\data\sphereGeom.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bin\data\aMadHeart.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

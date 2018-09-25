@@ -25,6 +25,8 @@ protected:
 	ShaderWatcher m_shader;
 	int m_width;
 	int m_height;
+	int m_xDivisions;
+	int m_yDivisions;
 
 
 
